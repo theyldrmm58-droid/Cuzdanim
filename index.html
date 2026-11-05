@@ -43,6 +43,8 @@ label{font-size:13px;color:#bdc9da}
 .big{font-size:27px;font-weight:bold;margin:8px 0}
 .progress{height:9px;background:#293a55;border-radius:20px;overflow:hidden;margin:9px 0}
 .progress div{height:100%;background:#4ade80}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:16px 12px;margin-top:12px;background:#0e192a;border:1px solid #3978e8;border-radius:12px;font-weight:bold}
+.total-row strong{font-size:20px;color:#fb7185}
 hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 @media(max-width:500px){
 .grid{grid-template-columns:1fr 1fr}
@@ -527,7 +529,8 @@ line("Kira",c.rentLeft)+
 line("Diğer sabit giderler",c.fixedLeft)+
 line("Korunan sabit yatırım",c.investLeft)+
 line("Kart asgari ödeme tahmini",c.cardLeft)+
-line("Temel yaşam bütçesi",c.livingLeft);
+line("Temel yaşam bütçesi",c.livingLeft)+
+`<div class="total-row"><span>TOPLAM GİDER</span><strong>${money(c.totalRequired)}</strong></div>`;
 
 document.getElementById("minimumPayment").textContent=money(minPayment());
 document.getElementById("recommendedPayment").textContent=money(c.recommendedCard);
