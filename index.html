@@ -1,683 +1,465 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Cüzdanım" />
-  <title>Cüzdanım - Kişisel Bütçe</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      background: #0f172a;
-      color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    .tab { display: none; }
-    .tab.active { display: block; }
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 18px;
-      padding: 15px;
-    }
-    .field {
-      width: 100%;
-      background: #0f172a;
-      border: 1px solid #475569;
-      border-radius: 11px;
-      padding: 12px;
-      color: white;
-      margin-top: 5px;
-    }
-    .btn {
-      padding: 11px 14px;
-      border-radius: 11px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 100;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    .modal.show { display: flex; }
-    .panel {
-      background: #1e293b;
-      width: 100%;
-      max-width: 480px;
-      padding: 20px;
-      border-radius: 22px 22px 0 0;
-      max-height: 90vh;
-      overflow: auto;
-    }
-    .muted { color: #94a3b8; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Cüzdanım</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#eef2ff;font-family:Arial,sans-serif}
+header{padding:22px 18px;background:#111c2e;border-bottom:1px solid #26344b}
+header h1{margin:0;font-size:25px}
+header p{margin:6px 0 0;color:#9aabc4;font-size:13px}
+main{max-width:850px;margin:auto;padding:16px}
+.card{background:#152238;border:1px solid #293a55;border-radius:16px;padding:17px;margin-bottom:14px}
+.label{font-size:13px;color:#9aabc4}
+.balance{font-size:34px;font-weight:bold;margin:10px 0}
+.green{color:#4ade80}.red{color:#fb7185}.muted{color:#9aabc4}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{font-size:21px;font-weight:bold;margin-top:8px}
+nav{display:flex;gap:8px;overflow:auto;margin-bottom:15px}
+nav button{white-space:nowrap}
+button{background:#263b59;color:white;border:0;padding:12px 15px;border-radius:10px;font-weight:bold;cursor:pointer}
+button.active,.primary{background:#3978e8}
+button.danger{background:#9f3346}
+input,select{width:100%;background:#0e192a;color:white;border:1px solid #344761;border-radius:9px;padding:12px;margin:6px 0 13px;font-size:15px}
+label{font-size:13px;color:#bdc9da}
+h2{font-size:18px;margin:0 0 15px}
+h3{font-size:15px;margin:0 0 10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item{padding:12px 0;border-bottom:1px solid #293a55}
+.item:last-child{border:0}
+.small{font-size:12px;color:#9aabc4;margin-top:4px}
+.hidden{display:none}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{flex:1}
+.notice{font-size:12px;color:#9aabc4;line-height:1.5}
+@media(max-width:500px){.grid{grid-template-columns:1fr 1fr}.balance{font-size:29px}}
+</style>
 </head>
-<body class="pb-24">
+<body>
+<header>
+  <h1>💰 Cüzdanım</h1>
+  <p>Gelirlerini, harcamalarını ve borçlarını kontrol et.</p>
+</header>
 
-  <header class="sticky top-0 z-40 bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center">
-    <b class="text-lg">💰 Cüzdanım</b>
-    <button class="btn bg-slate-700" onclick="modal('backup')">Yedekleme</button>
-  </header>
+<main>
+<nav>
+  <button class="active" data-tab="home">Genel Bakış</button>
+  <button data-tab="transactions">İşlemler</button>
+  <button data-tab="add">İşlem Ekle</button>
+  <button data-tab="settings">Ayarlar</button>
+</nav>
 
-  <main class="max-w-md mx-auto p-4 space-y-4">
-    <section id="home" class="tab active space-y-4">
-      <div class="card">
-        <p class="text-xs muted">KULLANILABİLİR PARA</p>
-        <h1 id="available" class="text-3xl font-bold text-emerald-400 mt-2">0 TL</h1>
-        <div class="grid grid-cols-2 gap-4 mt-5 border-t border-slate-700 pt-4">
-          <div><p class="text-xs muted">Aylık Gelir</p><b id="incomeLabel">0 TL</b></div>
-          <div><p class="text-xs muted">Toplam Gider</p><b id="expenseLabel" class="text-rose-400">0 TL</b></div>
-        </div>
-      </div>
+<section id="home">
+  <div class="card">
+    <div class="label">Kullanılabilir Bakiyen</div>
+    <div class="balance" id="balance">0 TL</div>
+    <div class="small" id="balanceDate"></div>
+  </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div class="card"><p class="text-xs muted">Kalan Bütçe</p><b id="budgetLeft" class="text-blue-400 text-lg">0 TL</b></div>
-        <div class="card"><p class="text-xs muted">Nakit Birikim</p><b id="savingsLabel" class="text-emerald-400 text-lg">0 TL</b></div>
-      </div>
-
-      <div class="card space-y-3">
-        <b class="text-sm">Borçlar ve Yükümlülükler</b>
-        <div class="flex justify-between text-sm"><span class="muted">Kredi kartı borcu</span><b id="debtLabel">0 TL</b></div>
-        <div class="flex justify-between text-sm"><span class="muted">Kredi taksiti</span><b id="loanLabel">0 TL</b></div>
-        <div class="flex justify-between text-sm"><span class="muted">Kira ve faturalar</span><b id="billsLabel">0 TL</b></div>
-      </div>
-
-      <div class="card">
-        <div class="flex justify-between text-xs mb-3"><span class="muted">100.000 TL birikim hedefi</span><b id="goalPercent">%0</b></div>
-        <div class="h-2 rounded-full bg-slate-700 overflow-hidden"><div id="goalBar" class="h-full bg-emerald-500" style="width:0%"></div></div>
-      </div>
-
-      <button class="btn bg-emerald-600 w-full" onclick="openTransaction()">+ İşlem Ekle</button>
-    </section>
-
-    <section id="transactions" class="tab space-y-4">
-      <div class="flex justify-between items-center"><b class="text-lg">İşlemler</b><button class="btn bg-emerald-600" onclick="openTransaction()">+ Ekle</button></div>
-      <input id="search" class="field" placeholder="İşlem ara..." oninput="renderTransactions()" />
-      <div id="transactionList" class="space-y-2"></div>
-    </section>
-
-    <section id="budget" class="tab space-y-4">
-      <div class="flex justify-between items-center"><b class="text-lg">Kategori Bütçeleri</b><button class="btn bg-slate-700" onclick="openCategory()">+ Kategori</button></div>
-      <div id="categoryList" class="space-y-3"></div>
-    </section>
-
-    <section id="debts" class="tab space-y-4">
-      <b class="text-lg">Borç Yönetimi</b>
-      <div class="card space-y-3">
-        <div class="flex justify-between"><b>Kredi Kartı</b><button class="text-emerald-400 text-xs" onclick="openCC()">Düzenle</button></div>
-        <div class="flex justify-between text-sm"><span class="muted">Mevcut borç</span><b id="ccDebt">0 TL</b></div>
-        <div class="flex justify-between text-sm"><span class="muted">Planlanan harcama</span><b id="ccPlanned">0 TL</b></div>
-      </div>
-      <div class="card space-y-3">
-        <div class="flex justify-between"><b>Kredi Takibi</b><button class="text-emerald-400 text-xs" onclick="openLoan()">Düzenle</button></div>
-        <div class="flex justify-between text-sm"><span class="muted">Aylık taksit</span><b id="loanMonthly">0 TL</b></div>
-        <div class="flex justify-between text-sm"><span class="muted">Ödenen taksit</span><b id="loanProgress">0 / 0</b></div>
-        <div class="flex justify-between text-sm"><span class="muted">Kalan borç</span><b id="loanRemaining">0 TL</b></div>
-      </div>
-    </section>
-
-    <section id="reports" class="tab space-y-4">
-      <b class="text-lg">Raporlar ve Ayarlar</b>
-      <div class="card"><p class="text-xs muted mb-3">BU AYIN HARCAMALARI</p><canvas id="chart"></canvas></div>
-      <div class="card space-y-3">
-        <b>Finansal Ayarlar</b>
-        <button class="btn bg-slate-700 w-full" onclick="openSettings()">Maaş, kredi, kira ve birikim</button>
-      </div>
-    </section>
-  </main>
-
-  <nav class="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 z-50">
-    <div class="max-w-md mx-auto grid grid-cols-5 h-16 text-center text-xs">
-      <button onclick="tab('home')" id="nav-home" class="text-emerald-400">⌂<br>Ana Sayfa</button>
-      <button onclick="tab('transactions')" id="nav-transactions">▤<br>İşlemler</button>
-      <button onclick="tab('budget')" id="nav-budget">◉<br>Bütçe</button>
-      <button onclick="tab('debts')" id="nav-debts">▣<br>Borçlar</button>
-      <button onclick="tab('reports')" id="nav-reports">▥<br>Raporlar</button>
+  <div class="grid">
+    <div class="card">
+      <div class="label">Bu Ay Gelir</div>
+      <div class="stat green" id="income">0 TL</div>
     </div>
-  </nav>
-
-  <div id="txModal" class="modal">
-    <div class="panel space-y-3">
-      <div class="flex justify-between"><b>Yeni İşlem</b><button onclick="closeModal('txModal')">✕</button></div>
-      <form onsubmit="saveTransaction(event)" class="space-y-2">
-        <label class="text-xs muted">İşlem türü
-          <select id="txType" class="field">
-            <option value="expense">Gider</option>
-            <option value="income">Gelir</option>
-          </select>
-        </label>
-        <label class="text-xs muted">Tutar<input id="txAmount" type="number" min="0.01" step="0.01" class="field" required /></label>
-        <label class="text-xs muted">Kategori<select id="txCategory" class="field"></select></label>
-        <label class="text-xs muted">Ödeme yöntemi
-          <select id="txPayment" class="field">
-            <option>Nakit</option>
-            <option>Banka Kartı</option>
-            <option>Kredi Kartı</option>
-          </select>
-        </label>
-        <label class="text-xs muted">Tarih<input id="txDate" type="date" class="field" required /></label>
-        <label class="text-xs muted">Açıklama<input id="txDesc" class="field" placeholder="Açıklama" /></label>
-        <button class="btn bg-emerald-600 w-full">Kaydet</button>
-      </form>
+    <div class="card">
+      <div class="label">Bu Ay Gider</div>
+      <div class="stat red" id="expense">0 TL</div>
+    </div>
+    <div class="card">
+      <div class="label">Kredi Kartı Borcu</div>
+      <div class="stat" id="cardDebt">0 TL</div>
+    </div>
+    <div class="card">
+      <div class="label">Kalan Kredi Taksiti</div>
+      <div class="stat" id="loanLeft">0</div>
     </div>
   </div>
 
-  <div id="catModal" class="modal">
-    <div class="panel space-y-3">
-      <div class="flex justify-between"><b id="catTitle">Kategori</b><button onclick="closeModal('catModal')">✕</button></div>
-      <form onsubmit="saveCategory(event)" class="space-y-2">
-        <input id="catName" class="field" placeholder="Kategori adı" required />
-        <input id="catBudget" class="field" type="number" min="0" placeholder="Aylık bütçe" required />
-        <button class="btn bg-emerald-600 w-full">Kaydet</button>
-      </form>
-    </div>
+  <div class="card">
+    <h2>Son İşlemler</h2>
+    <div id="recent"></div>
   </div>
 
-  <div id="ccModal" class="modal">
-    <div class="panel space-y-3">
-      <div class="flex justify-between"><b>Kredi Kartı</b><button onclick="closeModal('ccModal')">✕</button></div>
-      <form onsubmit="saveCC(event)" class="space-y-2">
-        <label class="text-xs muted">Mevcut borç<input id="ccInput" type="number" min="0" class="field" required /></label>
-        <label class="text-xs muted">Planlanan harcama<input id="plannedInput" type="number" min="0" class="field" required /></label>
-        <button class="btn bg-emerald-600 w-full">Kaydet</button>
-      </form>
-    </div>
+  <div class="card">
+    <h2>Aylık Bilgiler</h2>
+    <div class="row"><span class="muted">Maaş</span><strong id="salaryInfo"></strong></div>
+    <div class="row" style="margin-top:12px"><span class="muted">Maaş günü</span><strong>Her ayın 15'i</strong></div>
+    <p class="notice">Maaş, ödeme günü geldiğinde uygulamayı açtığında otomatik eklenir. Aynı ay için ikinci kez eklenmez.</p>
+  </div>
+</section>
+
+<section id="transactions" class="hidden">
+  <div class="card">
+    <h2>Tüm İşlemler</h2>
+    <div id="allTransactions"></div>
+  </div>
+</section>
+
+<section id="add" class="hidden">
+  <div class="card">
+    <h2>Yeni İşlem Ekle</h2>
+    <form id="transactionForm">
+      <label>İşlem türü</label>
+      <select id="type">
+        <option value="expense">Gider</option>
+        <option value="income">Gelir</option>
+      </select>
+
+      <label>Açıklama</label>
+      <input id="description" placeholder="Örn. Market alışverişi" required>
+
+      <label>Kategori</label>
+      <select id="category">
+        <option>Market</option>
+        <option>Fatura</option>
+        <option>Yakıt</option>
+        <option>Ulaşım</option>
+        <option>Yemek</option>
+        <option>Alışveriş</option>
+        <option>Kişisel</option>
+        <option>Eğlence</option>
+        <option>Sağlık</option>
+        <option>Kredi ödemesi</option>
+        <option>Kredi kartı ödemesi</option>
+        <option>Maaş</option>
+        <option>Diğer</option>
+      </select>
+
+      <label>Tutar (TL)</label>
+      <input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+
+      <label>Tarih</label>
+      <input id="date" type="date" required>
+
+      <button class="primary" type="submit" style="width:100%">İşlemi Kaydet</button>
+    </form>
+  </div>
+</section>
+
+<section id="settings" class="hidden">
+  <div class="card">
+    <h2>Finansal Ayarlar</h2>
+    <label>Aylık maaş (TL)</label>
+    <input id="salary" type="number" min="0" step="0.01">
+
+    <label>Kredi kartı toplam borcu (TL)</label>
+    <input id="creditDebt" type="number" min="0" step="0.01">
+
+    <label>Kredi toplam taksit sayısı</label>
+    <input id="loanTotal" type="number" min="0" step="1">
+
+    <label>Ödenmiş taksit sayısı</label>
+    <input id="loanPaid" type="number" min="0" step="1">
+
+    <button class="primary" id="saveSettings" style="width:100%">Ayarları Kaydet</button>
   </div>
 
-  <div id="loanModal" class="modal">
-    <div class="panel space-y-3">
-      <div class="flex justify-between"><b>Kredi Bilgileri</b><button onclick="closeModal('loanModal')">✕</button></div>
-      <form onsubmit="saveLoan(event)" class="space-y-2">
-        <label class="text-xs muted">Aylık taksit<input id="loanInput" type="number" min="0" class="field" required /></label>
-        <label class="text-xs muted">Toplam taksit<input id="loanTotal" type="number" min="0" class="field" required /></label>
-        <label class="text-xs muted">Ödenen taksit<input id="loanPaid" type="number" min="0" class="field" required /></label>
-        <button class="btn bg-emerald-600 w-full">Kaydet</button>
-      </form>
+  <div class="card">
+    <h2>Verilerini Yedekle</h2>
+    <p class="notice">İşlemlerini JSON dosyası olarak dışa aktarabilir veya daha önce aldığın yedeği geri yükleyebilirsin.</p>
+    <div class="actions">
+      <button id="export">Yedeği İndir</button>
+      <button id="importBtn">Yedek Yükle</button>
     </div>
+    <input id="importFile" type="file" accept=".json,application/json" class="hidden">
   </div>
 
-  <div id="settingsModal" class="modal">
-    <div class="panel space-y-3">
-      <div class="flex justify-between"><b>Finansal Ayarlar</b><button onclick="closeModal('settingsModal')">✕</button></div>
-      <form onsubmit="saveSettings(event)" class="space-y-2">
-        <label class="text-xs muted">Aylık maaş<input id="salaryInput" type="number" min="0" class="field" required /></label>
-        <label class="text-xs muted">Aylık kredi taksiti<input id="fixedLoanInput" type="number" min="0" class="field" required /></label>
-        <label class="text-xs muted">Kira ve faturalar<input id="billsInput" type="number" min="0" class="field" required /></label>
-        <label class="text-xs muted">Nakit birikim<input id="savingsInput" type="number" min="0" class="field" required /></label>
-        <button class="btn bg-emerald-600 w-full">Güncelle</button>
-      </form>
-    </div>
+  <div class="card">
+    <h2>Bakiye Sistemi</h2>
+    <p class="notice">Başlangıç bakiyesi 12.000 TL olarak belirlenmiştir. Bu tutar 5 Kasım 2026 tarihindeki kullanılabilir paranı temsil eder. Önceki tarihli kayıtların geçmiş listesinde korunur ancak başlangıç bakiyesinden tekrar düşülmez.</p>
   </div>
+</section>
+</main>
 
-  <div id="backup" class="modal">
-    <div class="panel space-y-3">
-      <div class="flex justify-between"><b>Yedekleme</b><button onclick="closeModal('backup')">✕</button></div>
-      <button class="btn bg-slate-700 w-full" onclick="exportData()">JSON Yedeği İndir</button>
-      <label class="text-xs muted">Yedekten geri yükle<input type="file" accept=".json,application/json" class="field" onchange="importData(event)" /></label>
-      <p class="text-xs muted">Veriler cihazındaki tarayıcıda saklanır. Tarayıcı verilerini silmeden önce yedek al.</p>
+<script>
+(function(){
+"use strict";
+
+const STORAGE_KEY = "cuzdanim_state";
+const START_DATE = "2026-11-05";
+
+const DEFAULT = {
+  openingBalance: 12000,
+  openingDate: START_DATE,
+  salary: 94000,
+  salaryDay: 15,
+  creditDebt: 91140.42,
+  loanTotal: 24,
+  loanPaid: 8,
+  transactions: []
+};
+
+function readOldData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+
+function number(value, fallback=0){
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeTransaction(t, index){
+  if(!t || typeof t !== "object") return null;
+  const amount = number(t.amount ?? t.tutar, 0);
+  if(amount <= 0) return null;
+
+  let type = t.type || t.tur || "expense";
+  if(type === "gider") type = "expense";
+  if(type === "gelir") type = "income";
+  if(type !== "income" && type !== "expense") type = "expense";
+
+  return {
+    id: t.id || ("old-" + index + "-" + Date.now()),
+    type,
+    description: t.description || t.desc || t.aciklama || "İşlem",
+    category: t.category || t.kategori || "Diğer",
+    amount,
+    date: String(t.date || t.tarih || START_DATE).slice(0,10),
+    system: Boolean(t.system)
+  };
+}
+
+function migrate(){
+  const old = readOldData();
+  if(!old) return {...DEFAULT};
+
+  const oldTransactions = Array.isArray(old.transactions) ? old.transactions : [];
+  const transactions = oldTransactions
+    .map(normalizeTransaction)
+    .filter(Boolean);
+
+  return {
+    ...DEFAULT,
+    ...old,
+    openingBalance: number(old.openingBalance, DEFAULT.openingBalance),
+    openingDate: old.openingDate || START_DATE,
+    salary: number(old.salary ?? old.monthlySalary, DEFAULT.salary),
+    salaryDay: 15,
+    creditDebt: number(old.creditDebt ?? old.cardDebt, DEFAULT.creditDebt),
+    loanTotal: number(old.loanTotal ?? old.loan?.total, DEFAULT.loanTotal),
+    loanPaid: number(old.loanPaid ?? old.loan?.paid, DEFAULT.loanPaid),
+    transactions
+  };
+}
+
+let state;
+try{
+  const saved = localStorage.getItem(STORAGE_KEY);
+  state = saved ? JSON.parse(saved) : migrate();
+}catch(e){
+  state = migrate();
+}
+
+state = {...DEFAULT, ...state};
+if(!Array.isArray(state.transactions)) state.transactions = [];
+state.transactions = state.transactions.map(normalizeTransaction).filter(Boolean);
+
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function money(value){
+  return new Intl.NumberFormat("tr-TR",{
+    style:"currency",currency:"TRY",maximumFractionDigits:2
+  }).format(value || 0);
+}
+
+function today(){
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function monthKey(date){
+  return date.slice(0,7);
+}
+
+function salaryTransaction(){
+  const now = today();
+  const currentMonth = monthKey(now);
+  const payday = currentMonth + "-" + String(state.salaryDay || 15).padStart(2,"0");
+
+  if(now < payday || state.salary <= 0) return;
+
+  const exists = state.transactions.some(t => t.id === "salary-" + currentMonth);
+  if(exists) return;
+
+  state.transactions.push({
+    id:"salary-" + currentMonth,
+    type:"income",
+    description:"Aylık maaş",
+    category:"Maaş",
+    amount:number(state.salary),
+    date:payday,
+    system:true
+  });
+  save();
+}
+
+function currentBalance(){
+  const opening = number(state.openingBalance,12000);
+  const start = state.openingDate || START_DATE;
+
+  return opening + state.transactions
+    .filter(t => t.date >= start)
+    .reduce((sum,t)=>sum + (t.type === "income" ? t.amount : -t.amount),0);
+}
+
+function monthTotals(){
+  const m = monthKey(today());
+  const list = state.transactions.filter(t => monthKey(t.date) === m);
+  return {
+    income:list.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0),
+    expense:list.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0)
+  };
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function transactionHTML(t){
+  const sign = t.type === "income" ? "+" : "-";
+  const cls = t.type === "income" ? "green" : "red";
+  return `<div class="item">
+    <div class="row">
+      <div>
+        <strong>${escapeHTML(t.description)}</strong>
+        <div class="small">${escapeHTML(t.category)} · ${escapeHTML(t.date)}</div>
+      </div>
+      <div style="text-align:right">
+        <strong class="${cls}">${sign}${money(t.amount)}</strong>
+        ${t.system ? '<div class="small">Otomatik maaş</div>' : `<button class="danger" style="padding:6px 9px;margin-top:5px" onclick="deleteTransaction('${String(t.id).replace(/'/g,"")}')">Sil</button>`}
+      </div>
     </div>
-  </div>
-
-  <script>
-    const DEFAULT = {
-      settings: { salary: 94000, loan: 45000, bills: 15000, ccDebt: 91140.42, ccPlannedSpend: 35000, savings: 0 },
-      categories: [
-        { name: 'Market', budget: 10000 },
-        { name: 'Dışarıda yemek', budget: 5000 },
-        { name: 'Yakıt', budget: 4000 },
-        { name: 'Ulaşım', budget: 2000 },
-        { name: 'Faturalar', budget: 5000 },
-        { name: 'Kira', budget: 10000 },
-        { name: 'Kişisel harcamalar', budget: 4000 },
-        { name: 'Alışveriş', budget: 6000 },
-        { name: 'Eğlence', budget: 3000 },
-        { name: 'Sağlık', budget: 2000 },
-        { name: 'Diğer', budget: 3000 }
-      ],
-      transactions: [],
-      loanInfo: { totalCount: 24, paidCount: 8, monthlyAmount: 45000 }
-    };
-
-    function clone(value) {
-      return JSON.parse(JSON.stringify(value));
-    }
-
-    function load() {
-      try {
-        const saved = JSON.parse(localStorage.getItem('cuzdanim_state'));
-        if (!saved) return clone(DEFAULT);
-
-        return {
-          ...clone(DEFAULT),
-          ...saved,
-          settings: { ...DEFAULT.settings, ...(saved.settings || {}) },
-          loanInfo: { ...DEFAULT.loanInfo, ...(saved.loanInfo || {}) },
-          categories: Array.isArray(saved.categories) ? saved.categories : clone(DEFAULT.categories),
-          transactions: Array.isArray(saved.transactions) ? saved.transactions : []
-        };
-      } catch (err) {
-        return clone(DEFAULT);
-      }
-    }
-
-    let state = load();
-    let chart = null;
-    let editing = null;
-
-    const $ = (id) => document.getElementById(id);
-    const money = (n) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(n) || 0);
-    const val = (id) => Number($(id).value) || 0;
-
-    function currentMonth() {
-      return new Date().toISOString().slice(0, 7);
-    }
-
-    function monthTx() {
-      return state.transactions.filter((t) => (t.date || '').slice(0, 7) === currentMonth());
-    }
-
-    function persist() {
-      localStorage.setItem('cuzdanim_state', JSON.stringify(state));
-      render();
-    }
-
-    function modal(id) {
-      const el = $(id);
-      if (el) el.classList.add('show');
-    }
-
-    function closeModal(id) {
-      const el = $(id);
-      if (el) el.classList.remove('show');
-    }
-
-    function tab(id) {
-      document.querySelectorAll('.tab').forEach((x) => x.classList.remove('active'));
-      $(id).classList.add('active');
-      ['home', 'transactions', 'budget', 'debts', 'reports'].forEach((k) => {
-        $('nav-' + k).classList.toggle('text-emerald-400', k === id);
-      });
-      window.scrollTo(0, 0);
-      if (id === 'reports') renderChart();
-    }
-
-    function render() {
-      const s = state.settings;
-      const tx = monthTx();
-      const expenses = tx.filter((t) => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
-      const income = tx.filter((t) => t.type === 'income').reduce((a, t) => a + t.amount, 0);
-      const total = expenses + s.loan + s.bills;
-      const available = s.salary + income - total;
-
-      const availableEl = $('available');
-      if (availableEl) {
-        availableEl.textContent = money(available);
-        availableEl.className = 'text-3xl font-bold mt-2 ' + (available >= 0 ? 'text-emerald-400' : 'text-rose-400');
-      }
-
-      $('incomeLabel').textContent = money(s.salary + income);
-      $('expenseLabel').textContent = money(total);
-
-      const spent = tx.filter((t) => t.type === 'expense').reduce((a, t) => a + t.amount, 0);
-      const budgets = state.categories.reduce((a, c) => a + c.budget, 0);
-      $('budgetLeft').textContent = money(budgets - spent);
-      $('savingsLabel').textContent = money(s.savings);
-      $('debtLabel').textContent = money(s.ccDebt);
-      $('loanLabel').textContent = money(s.loan);
-      $('billsLabel').textContent = money(s.bills);
-      $('ccDebt').textContent = money(s.ccDebt);
-      $('ccPlanned').textContent = money(s.ccPlannedSpend);
-
-      const percent = Math.min(100, Math.max(0, (s.savings / 100000) * 100));
-      $('goalPercent').textContent = '%' + Math.round(percent);
-      $('goalBar').style.width = percent + '%';
-
-      const l = state.loanInfo;
-      $('loanMonthly').textContent = money(l.monthlyAmount);
-      $('loanProgress').textContent = l.paidCount + ' / ' + l.totalCount + ' Ay';
-      $('loanRemaining').textContent = money(Math.max(0, l.totalCount - l.paidCount) * l.monthlyAmount);
-
-      renderTransactions();
-      renderCategories();
-      populateCategories();
-    }
-
-    function renderTransactions() {
-      const q = (($('search')?.value || '').toLocaleLowerCase('tr'));
-      const list = $('transactionList');
-      list.innerHTML = '';
-
-      const items = [...state.transactions]
-        .filter((t) => (t.desc || '').toLocaleLowerCase('tr').includes(q) || (t.category || '').toLocaleLowerCase('tr').includes(q))
-        .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-
-      if (!items.length) {
-        list.innerHTML = "<p class='text-center muted text-xs py-6'>Kayıtlı işlem bulunamadı.</p>";
-        return;
-      }
-
-      items.forEach((t) => {
-        const box = document.createElement('div');
-        box.className = 'card flex justify-between items-center gap-2';
-
-        const left = document.createElement('div');
-        const title = document.createElement('b');
-        title.className = 'text-sm';
-        title.textContent = t.desc || t.category;
-
-        const detail = document.createElement('p');
-        detail.className = 'text-xs muted mt-1';
-        detail.textContent = (t.category || '') + ' • ' + (t.payment || '') + ' • ' + (t.date || '');
-        left.append(title, detail);
-
-        const right = document.createElement('div');
-        right.className = 'flex items-center gap-3';
-
-        const amount = document.createElement('b');
-        amount.className = 'text-sm ' + (t.type === 'income' ? 'text-emerald-400' : 'text-rose-400');
-        amount.textContent = (t.type === 'income' ? '+' : '−') + money(t.amount);
-
-        const del = document.createElement('button');
-        del.className = 'text-xs text-rose-400';
-        del.textContent = 'Sil';
-        del.onclick = () => {
-          if (confirm('İşlem silinsin mi?')) {
-            state.transactions = state.transactions.filter((x) => x.id !== t.id);
-            persist();
-          }
-        };
-
-        right.append(amount, del);
-        box.append(left, right);
-        list.append(box);
-      });
-    }
-
-    function renderCategories() {
-      const list = $('categoryList');
-      list.innerHTML = '';
-
-      state.categories.forEach((c, i) => {
-        const spent = monthTx().filter((t) => t.type === 'expense' && t.category === c.name).reduce((a, t) => a + t.amount, 0);
-        const pct = c.budget > 0 ? Math.min(100, (spent / c.budget) * 100) : 0;
-
-        const box = document.createElement('div');
-        box.className = 'card space-y-2';
-
-        const head = document.createElement('div');
-        head.className = 'flex justify-between text-sm gap-2';
-
-        const name = document.createElement('b');
-        name.textContent = c.name;
-
-        const amount = document.createElement('span');
-        amount.className = 'text-xs ' + (spent > c.budget ? 'text-rose-400' : 'muted');
-        amount.textContent = money(spent) + ' / ' + money(c.budget);
-        head.append(name, amount);
-
-        const bar = document.createElement('div');
-        bar.className = 'h-2 bg-slate-900 rounded-full overflow-hidden';
-
-        const fill = document.createElement('div');
-        fill.className = 'h-full rounded-full ' + (spent > c.budget ? 'bg-rose-500' : 'bg-emerald-500');
-        fill.style.width = pct + '%';
-        bar.append(fill);
-
-        const actions = document.createElement('div');
-        actions.className = 'flex justify-end gap-4';
-
-        const edit = document.createElement('button');
-        edit.className = 'text-xs text-blue-400';
-        edit.textContent = 'Düzenle';
-        edit.onclick = () => openCategory(i);
-
-        const del = document.createElement('button');
-        del.className = 'text-xs text-rose-400';
-        del.textContent = 'Sil';
-        del.onclick = () => {
-          if (confirm(c.name + ' silinsin mi?')) {
-            state.categories.splice(i, 1);
-            persist();
-          }
-        };
-
-        actions.append(edit, del);
-        box.append(head, bar, actions);
-        list.append(box);
-      });
-    }
-
-    function populateCategories() {
-      const sel = $('txCategory');
-      if (!sel) return;
-      sel.innerHTML = '';
-      state.categories.forEach((c) => {
-        const o = document.createElement('option');
-        o.value = c.name;
-        o.textContent = c.name;
-        sel.append(o);
-      });
-    }
-
-    function openTransaction() {
-      if (!state.categories.length) {
-        alert('Önce kategori ekle.');
-        return;
-      }
-      $('txDate').value = new Date().toISOString().slice(0, 10);
-      populateCategories();
-      modal('txModal');
-    }
-
-    function saveTransaction(e) {
-      e.preventDefault();
-      const amount = val('txAmount');
-      if (amount <= 0) {
-        alert('Tutar sıfırdan büyük olmalı.');
-        return;
-      }
-
-      state.transactions.push({
-        id: String(Date.now()) + Math.random(),
-        type: $('txType').value,
-        amount,
-        category: $('txCategory').value,
-        payment: $('txPayment').value,
-        date: $('txDate').value,
-        desc: $('txDesc').value.trim()
-      });
-
-      persist();
-      closeModal('txModal');
-      e.target.reset();
-    }
-
-    function openCategory(i = null) {
-      editing = i;
-      $('catTitle').textContent = i === null ? 'Kategori ekle' : 'Kategori düzenle';
-      $('catName').value = i === null ? '' : state.categories[i].name;
-      $('catBudget').value = i === null ? '' : state.categories[i].budget;
-      modal('catModal');
-    }
-
-    function saveCategory(e) {
-      e.preventDefault();
-      const name = $('catName').value.trim();
-      const budget = val('catBudget');
-
-      if (!name) {
-        alert('Kategori adı boş olamaz.');
-        return;
-      }
-
-      if (state.categories.some((c, idx) => c.name.toLocaleLowerCase('tr') === name.toLocaleLowerCase('tr') && idx !== editing)) {
-        alert('Bu kategori zaten var.');
-        return;
-      }
-
-      if (editing === null) {
-        state.categories.push({ name, budget });
-      } else {
-        const oldName = state.categories[editing].name;
-        state.categories[editing] = { name, budget };
-        state.transactions.forEach((t) => {
-          if (t.category === oldName) t.category = name;
-        });
-      }
-
-      persist();
-      closeModal('catModal');
-      e.target.reset();
-    }
-
-    function openCC() {
-      $('ccInput').value = state.settings.ccDebt;
-      $('plannedInput').value = state.settings.ccPlannedSpend;
-      modal('ccModal');
-    }
-
-    function saveCC(e) {
-      e.preventDefault();
-      state.settings.ccDebt = val('ccInput');
-      state.settings.ccPlannedSpend = val('plannedInput');
-      persist();
-      closeModal('ccModal');
-    }
-
-    function openLoan() {
-      const l = state.loanInfo;
-      $('loanInput').value = l.monthlyAmount;
-      $('loanTotal').value = l.totalCount;
-      $('loanPaid').value = l.paidCount;
-      modal('loanModal');
-    }
-
-    function saveLoan(e) {
-      e.preventDefault();
-      const total = Math.floor(val('loanTotal'));
-      const paid = Math.floor(val('loanPaid'));
-      if (paid > total) {
-        alert('Ödenen taksit toplam taksitten fazla olamaz.');
-        return;
-      }
-
-      state.loanInfo = {
-        monthlyAmount: val('loanInput'),
-        totalCount: total,
-        paidCount: paid
-      };
-      state.settings.loan = val('loanInput');
-      persist();
-      closeModal('loanModal');
-    }
-
-    function openSettings() {
-      const s = state.settings;
-      $('salaryInput').value = s.salary;
-      $('fixedLoanInput').value = s.loan;
-      $('billsInput').value = s.bills;
-      $('savingsInput').value = s.savings;
-      modal('settingsModal');
-    }
-
-    function saveSettings(e) {
-      e.preventDefault();
-      Object.assign(state.settings, {
-        salary: val('salaryInput'),
-        loan: val('fixedLoanInput'),
-        bills: val('billsInput'),
-        savings: val('savingsInput')
-      });
-      state.loanInfo.monthlyAmount = state.settings.loan;
-      persist();
-      closeModal('settingsModal');
-    }
-
-    function exportData() {
-      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'cuzdanim-yedek.json';
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function importData(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const x = JSON.parse(reader.result);
-          if (!x.settings || !Array.isArray(x.categories) || !Array.isArray(x.transactions)) throw new Error('invalid backup');
-
-          state = {
-            ...clone(DEFAULT),
-            ...x,
-            settings: { ...DEFAULT.settings, ...(x.settings || {}) },
-            loanInfo: { ...DEFAULT.loanInfo, ...(x.loanInfo || {}) }
-          };
-
-          persist();
-          closeModal('backup');
-          alert('Yedek yüklendi.');
-        } catch (err) {
-          alert('Yedek dosyası geçersiz.');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function renderChart() {
-      if (!window.Chart) return;
-      const totals = {};
-      monthTx().filter((t) => t.type === 'expense').forEach((t) => {
-        totals[t.category] = (totals[t.category] || 0) + t.amount;
-      });
-
-      const labels = Object.keys(totals).filter((k) => totals[k] > 0);
-      if (chart) chart.destroy();
-      const ctx = $('chart').getContext('2d');
-
-      if (!labels.length) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        return;
-      }
-
-      chart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels,
-          datasets: [{
-            data: labels.map((k) => totals[k]),
-            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#22c55e', '#a78bfa']
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              labels: {
-                color: '#e2e8f0'
-              }
-            }
-          }
-        }
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      render();
-    });
-  </script>
+  </div>`;
+}
+
+function render(){
+  salaryTransaction();
+
+  const totals = monthTotals();
+  document.getElementById("balance").textContent = money(currentBalance());
+  document.getElementById("income").textContent = money(totals.income);
+  document.getElementById("expense").textContent = money(totals.expense);
+  document.getElementById("cardDebt").textContent = money(state.creditDebt);
+  document.getElementById("loanLeft").textContent =
+    Math.max(0,number(state.loanTotal)-number(state.loanPaid)) + " taksit";
+  document.getElementById("salaryInfo").textContent = money(state.salary);
+  document.getElementById("balanceDate").textContent =
+    "Devir bakiyesi dahil · " + new Date().toLocaleDateString("tr-TR");
+
+  const sorted = [...state.transactions].sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById("recent").innerHTML =
+    sorted.slice(0,5).map(transactionHTML).join("") ||
+    '<p class="muted">Henüz işlem eklenmedi.</p>';
+
+  document.getElementById("allTransactions").innerHTML =
+    sorted.map(transactionHTML).join("") ||
+    '<p class="muted">Henüz işlem bulunmuyor.</p>';
+
+  document.getElementById("salary").value = state.salary;
+  document.getElementById("creditDebt").value = state.creditDebt;
+  document.getElementById("loanTotal").value = state.loanTotal;
+  document.getElementById("loanPaid").value = state.loanPaid;
+}
+
+window.deleteTransaction = function(id){
+  const t = state.transactions.find(x=>String(x.id)===String(id));
+  if(!t || t.system) return;
+  if(!confirm("Bu işlemi silmek istiyor musun?")) return;
+  state.transactions = state.transactions.filter(x=>String(x.id)!==String(id));
+  save();
+  render();
+};
+
+document.querySelectorAll("nav button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
+    document.getElementById(btn.dataset.tab).classList.remove("hidden");
+  });
+});
+
+document.getElementById("date").value = today();
+
+document.getElementById("transactionForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const amount = number(document.getElementById("amount").value);
+  if(amount <= 0){alert("Geçerli bir tutar gir.");return;}
+
+  state.transactions.push({
+    id:"tx-" + Date.now(),
+    type:document.getElementById("type").value,
+    description:document.getElementById("description").value.trim(),
+    category:document.getElementById("category").value,
+    amount,
+    date:document.getElementById("date").value || today(),
+    system:false
+  });
+
+  save();
+  e.target.reset();
+  document.getElementById("date").value = today();
+  alert("İşlem kaydedildi.");
+  render();
+  document.querySelector('[data-tab="home"]').click();
+});
+
+document.getElementById("saveSettings").addEventListener("click",()=>{
+  state.salary = Math.max(0,number(document.getElementById("salary").value));
+  state.creditDebt = Math.max(0,number(document.getElementById("creditDebt").value));
+  state.loanTotal = Math.max(0,number(document.getElementById("loanTotal").value));
+  state.loanPaid = Math.max(0,number(document.getElementById("loanPaid").value));
+  save();
+  render();
+  alert("Ayarların kaydedildi.");
+});
+
+document.getElementById("export").addEventListener("click",()=>{
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cuzdanim-yedek.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importBtn").addEventListener("click",()=>{
+  document.getElementById("importFile").click();
+});
+
+document.getElementById("importFile").addEventListener("change",async e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const imported = JSON.parse(await file.text());
+    if(!Array.isArray(imported.transactions)) throw new Error("Geçersiz yedek");
+    if(!confirm("Mevcut verilerin yedek dosyasındaki verilerle değiştirilecek. Devam edilsin mi?")) return;
+    state = {...DEFAULT,...imported};
+    state.transactions = state.transactions.map(normalizeTransaction).filter(Boolean);
+    save();
+    render();
+    alert("Yedek başarıyla yüklendi.");
+  }catch(err){
+    alert("Yedek dosyası okunamadı.");
+  }
+});
+
+save();
+render();
+
+})();
+</script>
 </body>
 </html>
