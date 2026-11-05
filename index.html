@@ -8,169 +8,256 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0b1220;color:#eef2ff;font-family:Arial,sans-serif}
-header{padding:22px 18px;background:#111c2e;border-bottom:1px solid #26344b}
+header{padding:20px;background:#111c2e;border-bottom:1px solid #293a55}
 header h1{margin:0;font-size:25px}
-header p{margin:6px 0 0;color:#9aabc4;font-size:13px}
-main{max-width:850px;margin:auto;padding:16px}
-.card{background:#152238;border:1px solid #293a55;border-radius:16px;padding:17px;margin-bottom:14px}
-.label{font-size:13px;color:#9aabc4}
-.balance{font-size:34px;font-weight:bold;margin:10px 0}
-.green{color:#4ade80}.red{color:#fb7185}.muted{color:#9aabc4}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat{font-size:21px;font-weight:bold;margin-top:8px}
-nav{display:flex;gap:8px;overflow:auto;margin-bottom:15px}
-nav button{white-space:nowrap}
-button{background:#263b59;color:white;border:0;padding:12px 15px;border-radius:10px;font-weight:bold;cursor:pointer}
+header p{color:#9aabc4;font-size:13px;margin:6px 0 0}
+main{max-width:900px;margin:auto;padding:15px}
+nav{display:flex;gap:7px;overflow:auto;margin-bottom:15px}
+button{border:0;border-radius:10px;padding:12px 14px;background:#293b57;color:white;font-weight:bold;cursor:pointer}
 button.active,.primary{background:#3978e8}
-button.danger{background:#9f3346}
-input,select{width:100%;background:#0e192a;color:white;border:1px solid #344761;border-radius:9px;padding:12px;margin:6px 0 13px;font-size:15px}
-label{font-size:13px;color:#bdc9da}
-h2{font-size:18px;margin:0 0 15px}
+button.danger{background:#a33349}
+nav button{white-space:nowrap}
+.card{background:#152238;border:1px solid #293a55;border-radius:16px;padding:17px;margin-bottom:14px}
+h2{font-size:18px;margin:0 0 14px}
 h3{font-size:15px;margin:0 0 10px}
+.label{color:#9aabc4;font-size:13px}
+.balance{font-size:34px;font-weight:bold;margin:9px 0}
+.green{color:#4ade80}.red{color:#fb7185}.yellow{color:#fbbf24}
+.muted{color:#9aabc4}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{font-size:21px;font-weight:bold;margin-top:8px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .item{padding:12px 0;border-bottom:1px solid #293a55}
 .item:last-child{border:0}
-.small{font-size:12px;color:#9aabc4;margin-top:4px}
+.small{font-size:12px;color:#9aabc4;margin-top:5px;line-height:1.5}
+input,select{width:100%;background:#0e192a;color:white;border:1px solid #344761;border-radius:9px;padding:12px;margin:6px 0 13px;font-size:15px}
+label{font-size:13px;color:#bdc9da}
 .hidden{display:none}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .actions button{flex:1}
-.notice{font-size:12px;color:#9aabc4;line-height:1.5}
-@media(max-width:500px){.grid{grid-template-columns:1fr 1fr}.balance{font-size:29px}}
+.notice{font-size:13px;line-height:1.6;color:#bdc9da}
+.advice{border-left:4px solid #3978e8;padding:12px;background:#101d31;border-radius:8px;margin:10px 0;line-height:1.6}
+.advice.warning{border-color:#fbbf24}
+.advice.good{border-color:#4ade80}
+.advice.bad{border-color:#fb7185}
+.big{font-size:27px;font-weight:bold;margin:8px 0}
+.progress{height:9px;background:#293a55;border-radius:20px;overflow:hidden;margin:9px 0}
+.progress div{height:100%;background:#4ade80}
+hr{border:0;border-top:1px solid #293a55;margin:14px 0}
+@media(max-width:500px){
+.grid{grid-template-columns:1fr 1fr}
+.balance{font-size:29px}
+.stat{font-size:18px}
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>💰 Cüzdanım</h1>
-  <p>Gelirlerini, harcamalarını ve borçlarını kontrol et.</p>
+<h1>💰 Cüzdanım</h1>
+<p>Paranı yönet, borçlarını planla, geleceğini biriktir.</p>
 </header>
 
 <main>
 <nav>
-  <button class="active" data-tab="home">Genel Bakış</button>
-  <button data-tab="transactions">İşlemler</button>
-  <button data-tab="add">İşlem Ekle</button>
-  <button data-tab="settings">Ayarlar</button>
+<button class="active" data-tab="home">Özet</button>
+<button data-tab="plan">Ödeme Planı</button>
+<button data-tab="transactions">İşlemler</button>
+<button data-tab="add">İşlem Ekle</button>
+<button data-tab="settings">Ayarlar</button>
 </nav>
 
 <section id="home">
-  <div class="card">
-    <div class="label">Kullanılabilir Bakiyen</div>
-    <div class="balance" id="balance">0 TL</div>
-    <div class="small" id="balanceDate"></div>
-  </div>
+<div class="card">
+<div class="label">Kullanılabilir Bakiyen</div>
+<div class="balance" id="balance">0 TL</div>
+<div class="small" id="balanceInfo"></div>
+</div>
 
-  <div class="grid">
-    <div class="card">
-      <div class="label">Bu Ay Gelir</div>
-      <div class="stat green" id="income">0 TL</div>
-    </div>
-    <div class="card">
-      <div class="label">Bu Ay Gider</div>
-      <div class="stat red" id="expense">0 TL</div>
-    </div>
-    <div class="card">
-      <div class="label">Kredi Kartı Borcu</div>
-      <div class="stat" id="cardDebt">0 TL</div>
-    </div>
-    <div class="card">
-      <div class="label">Kalan Kredi Taksiti</div>
-      <div class="stat" id="loanLeft">0</div>
-    </div>
-  </div>
+<div class="grid">
+<div class="card">
+<div class="label">Bu Ay Gelir</div>
+<div class="stat green" id="income">0 TL</div>
+</div>
+<div class="card">
+<div class="label">Bu Ay Gider</div>
+<div class="stat red" id="expense">0 TL</div>
+</div>
+<div class="card">
+<div class="label">Kredi Kartı Borcu</div>
+<div class="stat red" id="cardDebt">0 TL</div>
+</div>
+<div class="card">
+<div class="label">Bu Ay Sabit Yatırım</div>
+<div class="stat green" id="fixedInvestment">3.000 TL</div>
+</div>
+</div>
 
-  <div class="card">
-    <h2>Son İşlemler</h2>
-    <div id="recent"></div>
-  </div>
+<div class="card">
+<h2>🤖 Finansal Asistanın</h2>
+<div id="mainAdvice"></div>
+</div>
 
-  <div class="card">
-    <h2>Aylık Bilgiler</h2>
-    <div class="row"><span class="muted">Maaş</span><strong id="salaryInfo"></strong></div>
-    <div class="row" style="margin-top:12px"><span class="muted">Maaş günü</span><strong>Her ayın 15'i</strong></div>
-    <p class="notice">Maaş, ödeme günü geldiğinde uygulamayı açtığında otomatik eklenir. Aynı ay için ikinci kez eklenmez.</p>
-  </div>
+<div class="card">
+<h2>Bu Ayın Ödeme Planı</h2>
+<div id="miniPlan"></div>
+</div>
+
+<div class="card">
+<h2>Son İşlemler</h2>
+<div id="recent"></div>
+</div>
+</section>
+
+<section id="plan" class="hidden">
+<div class="card">
+<h2>🤖 Akıllı Ödeme Planı</h2>
+<p class="notice">Uygulama mevcut paranı, maaşını ve zorunlu ödemelerini değerlendirerek sana ödeme önerisi oluşturur.</p>
+<div id="planAdvice"></div>
+</div>
+
+<div class="card">
+<h2>Kredi Kartı Ödeme Önerisi</h2>
+<div class="label">Tahmini asgari ödeme</div>
+<div class="big yellow" id="minimumPayment">0 TL</div>
+<hr>
+<div class="label">Bu ay önerilen ödeme</div>
+<div class="big green" id="recommendedPayment">0 TL</div>
+<div class="small" id="cardExplanation"></div>
+</div>
+
+<div class="card">
+<h2>Yatırım Planın</h2>
+<div class="row">
+<span>Sabit yatırım</span>
+<strong class="green">3.000 TL</strong>
+</div>
+<div class="small">Her ay korunacak. Ek yatırım bütçesinden bağımsızdır.</div>
+<hr>
+<div class="row">
+<span>Ek yatırım önerisi</span>
+<strong id="extraInvestment">0 TL</strong>
+</div>
+<div class="small">Ayın kalan bütçesine göre hesaplanır.</div>
+</div>
+
+<div class="card">
+<h2>Paranın Dağılımı</h2>
+<div id="planDetails"></div>
+</div>
 </section>
 
 <section id="transactions" class="hidden">
-  <div class="card">
-    <h2>Tüm İşlemler</h2>
-    <div id="allTransactions"></div>
-  </div>
+<div class="card">
+<h2>Tüm İşlemlerin</h2>
+<div id="allTransactions"></div>
+</div>
 </section>
 
 <section id="add" class="hidden">
-  <div class="card">
-    <h2>Yeni İşlem Ekle</h2>
-    <form id="transactionForm">
-      <label>İşlem türü</label>
-      <select id="type">
-        <option value="expense">Gider</option>
-        <option value="income">Gelir</option>
-      </select>
+<div class="card">
+<h2>Yeni İşlem Ekle</h2>
+<form id="transactionForm">
+<label>İşlem türü</label>
+<select id="type">
+<option value="expense">Gider</option>
+<option value="income">Gelir</option>
+</select>
 
-      <label>Açıklama</label>
-      <input id="description" placeholder="Örn. Market alışverişi" required>
+<label>Açıklama</label>
+<input id="description" placeholder="Örn. Market alışverişi" required>
 
-      <label>Kategori</label>
-      <select id="category">
-        <option>Market</option>
-        <option>Fatura</option>
-        <option>Yakıt</option>
-        <option>Ulaşım</option>
-        <option>Yemek</option>
-        <option>Alışveriş</option>
-        <option>Kişisel</option>
-        <option>Eğlence</option>
-        <option>Sağlık</option>
-        <option>Kredi ödemesi</option>
-        <option>Kredi kartı ödemesi</option>
-        <option>Maaş</option>
-        <option>Diğer</option>
-      </select>
+<label>Kategori</label>
+<select id="category">
+<option>Market</option>
+<option>Kira</option>
+<option>Fatura</option>
+<option>Yakıt</option>
+<option>Ulaşım</option>
+<option>Yemek</option>
+<option>Alışveriş</option>
+<option>Kişisel</option>
+<option>Eğlence</option>
+<option>Sağlık</option>
+<option>Kredi ödemesi</option>
+<option>Kredi kartı ödemesi</option>
+<option>Sabit yatırım</option>
+<option>Ek yatırım</option>
+<option>Maaş</option>
+<option>Diğer</option>
+</select>
 
-      <label>Tutar (TL)</label>
-      <input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+<label>Tutar (TL)</label>
+<input id="amount" type="number" min="0.01" step="0.01" required>
 
-      <label>Tarih</label>
-      <input id="date" type="date" required>
+<label>Tarih</label>
+<input id="date" type="date" required>
 
-      <button class="primary" type="submit" style="width:100%">İşlemi Kaydet</button>
-    </form>
-  </div>
+<button class="primary" type="submit" style="width:100%">Kaydet</button>
+</form>
+</div>
 </section>
 
 <section id="settings" class="hidden">
-  <div class="card">
-    <h2>Finansal Ayarlar</h2>
-    <label>Aylık maaş (TL)</label>
-    <input id="salary" type="number" min="0" step="0.01">
+<div class="card">
+<h2>Gelir ve Gider Ayarları</h2>
 
-    <label>Kredi kartı toplam borcu (TL)</label>
-    <input id="creditDebt" type="number" min="0" step="0.01">
+<label>Aylık maaş</label>
+<input id="salary" type="number" min="0" step=".01">
 
-    <label>Kredi toplam taksit sayısı</label>
-    <input id="loanTotal" type="number" min="0" step="1">
+<label>Kredi taksiti</label>
+<input id="loanPayment" type="number" min="0" step=".01">
 
-    <label>Ödenmiş taksit sayısı</label>
-    <input id="loanPaid" type="number" min="0" step="1">
+<label>Aylık diğer sabit giderler</label>
+<input id="fixedExpenses" type="number" min="0" step=".01">
 
-    <button class="primary" id="saveSettings" style="width:100%">Ayarları Kaydet</button>
-  </div>
+<label>Aylık kira</label>
+<input id="rent" type="number" min="0" step=".01">
 
-  <div class="card">
-    <h2>Verilerini Yedekle</h2>
-    <p class="notice">İşlemlerini JSON dosyası olarak dışa aktarabilir veya daha önce aldığın yedeği geri yükleyebilirsin.</p>
-    <div class="actions">
-      <button id="export">Yedeği İndir</button>
-      <button id="importBtn">Yedek Yükle</button>
-    </div>
-    <input id="importFile" type="file" accept=".json,application/json" class="hidden">
-  </div>
+<label>Aylık temel yaşam bütçesi</label>
+<input id="livingBudget" type="number" min="0" step=".01">
 
-  <div class="card">
-    <h2>Bakiye Sistemi</h2>
-    <p class="notice">Başlangıç bakiyesi 12.000 TL olarak belirlenmiştir. Bu tutar 5 Kasım 2026 tarihindeki kullanılabilir paranı temsil eder. Önceki tarihli kayıtların geçmiş listesinde korunur ancak başlangıç bakiyesinden tekrar düşülmez.</p>
-  </div>
+<label>Sabit yatırım (dokunulmayacak)</label>
+<input id="protectedInvestment" type="number" min="0" step=".01">
+
+<label>Kredi taksit toplamı</label>
+<input id="loanTotal" type="number" min="0">
+
+<label>Ödenmiş kredi taksiti</label>
+<input id="loanPaid" type="number" min="0">
+
+<button class="primary" id="saveSettings" style="width:100%">Ayarları Kaydet</button>
+</div>
+
+<div class="card">
+<h2>Kredi Kartı Bilgileri</h2>
+
+<label>Toplam kart limiti</label>
+<input id="cardLimit" type="number" min="0" step=".01">
+
+<label>Güncel toplam kart borcu</label>
+<input id="cardDebtInput" type="number" min="0" step=".01">
+
+<label>Güncel dönem borcu</label>
+<input id="cardPeriod" type="number" min="0" step=".01">
+
+<label>Asgari ödeme oranı (%)</label>
+<input id="minimumRate" type="number" min="0" max="100" step=".01">
+
+<label>Son ödeme tarihi</label>
+<input id="cardDue" type="date">
+
+<button class="primary" id="saveCard" style="width:100%">Kart Bilgilerini Kaydet</button>
+</div>
+
+<div class="card">
+<h2>Yedekleme</h2>
+<div class="actions">
+<button id="export">Yedeği İndir</button>
+<button id="importBtn">Yedek Yükle</button>
+</div>
+<input id="importFile" type="file" accept=".json" class="hidden">
+<p class="notice">Düzenli olarak yedek almanı öneririm.</p>
+</div>
 </section>
 </main>
 
@@ -178,287 +265,408 @@ h3{font-size:15px;margin:0 0 10px}
 (function(){
 "use strict";
 
-const STORAGE_KEY = "cuzdanim_state";
-const START_DATE = "2026-11-05";
+const KEY="cuzdanim_state";
+const START="2026-11-05";
 
-const DEFAULT = {
-  openingBalance: 12000,
-  openingDate: START_DATE,
-  salary: 94000,
-  salaryDay: 15,
-  creditDebt: 91140.42,
-  loanTotal: 24,
-  loanPaid: 8,
-  transactions: []
+const DEFAULT={
+openingBalance:12000,
+openingDate:START,
+salary:94000,
+salaryDay:15,
+loanPayment:45000,
+fixedExpenses:15000,
+rent:0,
+livingBudget:0,
+protectedInvestment:3000,
+loanTotal:24,
+loanPaid:8,
+cardLimit:140400,
+creditDebt:91140.42,
+cardPeriod:76030.07,
+minimumRate:40,
+cardDue:"2026-11-26",
+transactions:[]
 };
 
-function readOldData(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  }catch(e){ return null; }
+function num(v,d=0){
+let n=Number(v);
+return Number.isFinite(n)?n:d;
 }
 
-function number(value, fallback=0){
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
+function readOld(){
+try{
+let x=localStorage.getItem(KEY);
+return x?JSON.parse(x):null;
+}catch(e){return null;}
 }
 
-function normalizeTransaction(t, index){
-  if(!t || typeof t !== "object") return null;
-  const amount = number(t.amount ?? t.tutar, 0);
-  if(amount <= 0) return null;
-
-  let type = t.type || t.tur || "expense";
-  if(type === "gider") type = "expense";
-  if(type === "gelir") type = "income";
-  if(type !== "income" && type !== "expense") type = "expense";
-
-  return {
-    id: t.id || ("old-" + index + "-" + Date.now()),
-    type,
-    description: t.description || t.desc || t.aciklama || "İşlem",
-    category: t.category || t.kategori || "Diğer",
-    amount,
-    date: String(t.date || t.tarih || START_DATE).slice(0,10),
-    system: Boolean(t.system)
-  };
+function normalize(t,i){
+if(!t||typeof t!=="object")return null;
+let a=num(t.amount??t.tutar);
+if(a<=0)return null;
+let type=t.type||t.tur||"expense";
+if(type==="gider")type="expense";
+if(type==="gelir")type="income";
+if(type!=="income"&&type!=="expense")type="expense";
+return{
+id:t.id||"old-"+i,
+type,
+description:t.description||t.desc||t.aciklama||"İşlem",
+category:t.category||t.kategori||"Diğer",
+amount:a,
+date:String(t.date||t.tarih||START).slice(0,10),
+system:!!t.system
+};
 }
 
 function migrate(){
-  const old = readOldData();
-  if(!old) return {...DEFAULT};
-
-  const oldTransactions = Array.isArray(old.transactions) ? old.transactions : [];
-  const transactions = oldTransactions
-    .map(normalizeTransaction)
-    .filter(Boolean);
-
-  return {
-    ...DEFAULT,
-    ...old,
-    openingBalance: number(old.openingBalance, DEFAULT.openingBalance),
-    openingDate: old.openingDate || START_DATE,
-    salary: number(old.salary ?? old.monthlySalary, DEFAULT.salary),
-    salaryDay: 15,
-    creditDebt: number(old.creditDebt ?? old.cardDebt, DEFAULT.creditDebt),
-    loanTotal: number(old.loanTotal ?? old.loan?.total, DEFAULT.loanTotal),
-    loanPaid: number(old.loanPaid ?? old.loan?.paid, DEFAULT.loanPaid),
-    transactions
-  };
+let old=readOld();
+if(!old)return {...DEFAULT};
+let transactions=Array.isArray(old.transactions)?old.transactions.map(normalize).filter(Boolean):[];
+return {
+...DEFAULT,
+...old,
+openingBalance:num(old.openingBalance,12000),
+openingDate:old.openingDate||START,
+salary:num(old.salary??old.monthlySalary,94000),
+loanPayment:num(old.loanPayment,45000),
+fixedExpenses:num(old.fixedExpenses,15000),
+rent:num(old.rent,0),
+livingBudget:num(old.livingBudget,0),
+protectedInvestment:num(old.protectedInvestment,3000),
+creditDebt:num(old.creditDebt??old.cardDebt,91140.42),
+cardPeriod:num(old.cardPeriod,76030.07),
+cardLimit:num(old.cardLimit,140400),
+minimumRate:num(old.minimumRate,40),
+transactions
+};
 }
 
 let state;
 try{
-  const saved = localStorage.getItem(STORAGE_KEY);
-  state = saved ? JSON.parse(saved) : migrate();
-}catch(e){
-  state = migrate();
-}
+let raw=localStorage.getItem(KEY);
+state=raw?JSON.parse(raw):migrate();
+}catch(e){state=migrate();}
 
-state = {...DEFAULT, ...state};
-if(!Array.isArray(state.transactions)) state.transactions = [];
-state.transactions = state.transactions.map(normalizeTransaction).filter(Boolean);
+state={...DEFAULT,...state};
+if(!Array.isArray(state.transactions))state.transactions=[];
+state.transactions=state.transactions.map(normalize).filter(Boolean);
 
 function save(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function money(value){
-  return new Intl.NumberFormat("tr-TR",{
-    style:"currency",currency:"TRY",maximumFractionDigits:2
-  }).format(value || 0);
+localStorage.setItem(KEY,JSON.stringify(state));
 }
 
 function today(){
-  const d = new Date();
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+let d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
-function monthKey(date){
-  return date.slice(0,7);
+function month(){
+return today().slice(0,7);
 }
 
-function salaryTransaction(){
-  const now = today();
-  const currentMonth = monthKey(now);
-  const payday = currentMonth + "-" + String(state.salaryDay || 15).padStart(2,"0");
-
-  if(now < payday || state.salary <= 0) return;
-
-  const exists = state.transactions.some(t => t.id === "salary-" + currentMonth);
-  if(exists) return;
-
-  state.transactions.push({
-    id:"salary-" + currentMonth,
-    type:"income",
-    description:"Aylık maaş",
-    category:"Maaş",
-    amount:number(state.salary),
-    date:payday,
-    system:true
-  });
-  save();
+function money(v){
+return new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(v||0);
 }
 
-function currentBalance(){
-  const opening = number(state.openingBalance,12000);
-  const start = state.openingDate || START_DATE;
-
-  return opening + state.transactions
-    .filter(t => t.date >= start)
-    .reduce((sum,t)=>sum + (t.type === "income" ? t.amount : -t.amount),0);
+function esc(s){
+return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
-function monthTotals(){
-  const m = monthKey(today());
-  const list = state.transactions.filter(t => monthKey(t.date) === m);
-  return {
-    income:list.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0),
-    expense:list.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0)
-  };
+function salaryAuto(){
+let m=month();
+let payday=m+"-"+String(state.salaryDay||15).padStart(2,"0");
+if(today()<payday||num(state.salary)<=0)return;
+if(state.transactions.some(t=>t.id==="salary-"+m))return;
+state.transactions.push({
+id:"salary-"+m,
+type:"income",
+description:"Aylık maaş",
+category:"Maaş",
+amount:num(state.salary),
+date:payday,
+system:true
+});
+save();
 }
 
-function escapeHTML(s){
-  return String(s).replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+function balance(){
+return num(state.openingBalance,12000)+state.transactions
+.filter(t=>t.date>=(state.openingDate||START))
+.reduce((s,t)=>s+(t.type==="income"?t.amount:-t.amount),0);
+}
+
+function monthlyTransactions(){
+return state.transactions.filter(t=>t.date.slice(0,7)===month());
+}
+
+function sumCategory(list,category){
+return list.filter(t=>t.type==="expense"&&t.category===category)
+.reduce((s,t)=>s+t.amount,0);
+}
+
+function minPayment(){
+return Math.max(0,num(state.cardPeriod)*num(state.minimumRate)/100);
+}
+
+function remainingPlan(){
+let list=monthlyTransactions();
+
+let loanLeft=Math.max(0,num(state.loanPayment)-sumCategory(list,"Kredi ödemesi"));
+let rentLeft=Math.max(0,num(state.rent)-sumCategory(list,"Kira"));
+
+let fixedPaid=sumCategory(list,"Fatura")+sumCategory(list,"Diğer");
+let fixedLeft=Math.max(0,num(state.fixedExpenses)-fixedPaid);
+
+let investLeft=Math.max(0,num(state.protectedInvestment)-sumCategory(list,"Sabit yatırım"));
+
+let cardLeft=Math.max(0,minPayment()-sumCategory(list,"Kredi kartı ödemesi"));
+
+let livingLeft=Math.max(0,num(state.livingBudget)-
+sumCategory(list,"Market")-
+sumCategory(list,"Yemek")-
+sumCategory(list,"Ulaşım")-
+sumCategory(list,"Yakıt")-
+sumCategory(list,"Kişisel")-
+sumCategory(list,"Sağlık"));
+
+return {loanLeft,rentLeft,fixedLeft,investLeft,cardLeft,livingLeft};
+}
+
+function expectedMoney(){
+let cash=balance();
+let m=month();
+let payday=m+"-15";
+let salaryReceived=state.transactions.some(t=>t.id==="salary-"+m);
+if(today()<payday&&!salaryReceived)cash+=num(state.salary);
+return cash;
+}
+
+function calculate(){
+let r=remainingPlan();
+let totalRequired=r.loanLeft+r.rentLeft+r.fixedLeft+r.investLeft+r.cardLeft+r.livingLeft;
+let available=expectedMoney();
+let afterMandatory=available-totalRequired;
+
+let extraCard=0;
+let extraInvestment=0;
+let recommendedCard=r.cardLeft;
+
+if(afterMandatory>=10000){
+extraCard=Math.floor((afterMandatory-5000)*0.5/100)*100;
+extraInvestment=Math.max(0,afterMandatory-5000-extraCard);
+recommendedCard+=extraCard;
+}else if(afterMandatory>0){
+extraCard=0;
+extraInvestment=0;
+}else{
+recommendedCard=r.cardLeft;
+}
+
+return {
+...r,
+available,
+totalRequired,
+afterMandatory,
+extraCard,
+extraInvestment,
+recommendedCard
+};
 }
 
 function transactionHTML(t){
-  const sign = t.type === "income" ? "+" : "-";
-  const cls = t.type === "income" ? "green" : "red";
-  return `<div class="item">
-    <div class="row">
-      <div>
-        <strong>${escapeHTML(t.description)}</strong>
-        <div class="small">${escapeHTML(t.category)} · ${escapeHTML(t.date)}</div>
-      </div>
-      <div style="text-align:right">
-        <strong class="${cls}">${sign}${money(t.amount)}</strong>
-        ${t.system ? '<div class="small">Otomatik maaş</div>' : `<button class="danger" style="padding:6px 9px;margin-top:5px" onclick="deleteTransaction('${String(t.id).replace(/'/g,"")}')">Sil</button>`}
-      </div>
-    </div>
-  </div>`;
+let sign=t.type==="income"?"+":"-";
+let color=t.type==="income"?"green":"red";
+return `<div class="item">
+<div class="row">
+<div><strong>${esc(t.description)}</strong>
+<div class="small">${esc(t.category)} · ${esc(t.date)}</div></div>
+<div style="text-align:right">
+<strong class="${color}">${sign}${money(t.amount)}</strong>
+${t.system?'<div class="small">Otomatik maaş</div>':`<button class="danger" style="padding:6px 9px;margin-top:5px" onclick="deleteTx('${esc(t.id)}')">Sil</button>`}
+</div>
+</div></div>`;
+}
+
+function line(name,value){
+return `<div class="row item"><span>${name}</span><strong>${money(value)}</strong></div>`;
 }
 
 function render(){
-  salaryTransaction();
+salaryAuto();
 
-  const totals = monthTotals();
-  document.getElementById("balance").textContent = money(currentBalance());
-  document.getElementById("income").textContent = money(totals.income);
-  document.getElementById("expense").textContent = money(totals.expense);
-  document.getElementById("cardDebt").textContent = money(state.creditDebt);
-  document.getElementById("loanLeft").textContent =
-    Math.max(0,number(state.loanTotal)-number(state.loanPaid)) + " taksit";
-  document.getElementById("salaryInfo").textContent = money(state.salary);
-  document.getElementById("balanceDate").textContent =
-    "Devir bakiyesi dahil · " + new Date().toLocaleDateString("tr-TR");
+let b=balance();
+let list=monthlyTransactions();
+let income=list.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
+let expense=list.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+let c=calculate();
 
-  const sorted = [...state.transactions].sort((a,b)=>b.date.localeCompare(a.date));
-  document.getElementById("recent").innerHTML =
-    sorted.slice(0,5).map(transactionHTML).join("") ||
-    '<p class="muted">Henüz işlem eklenmedi.</p>';
+document.getElementById("balance").textContent=money(b);
+document.getElementById("balanceInfo").textContent="Devir bakiyesi dahil · Bugünkü kullanılabilir para";
+document.getElementById("income").textContent=money(income);
+document.getElementById("expense").textContent=money(expense);
+document.getElementById("cardDebt").textContent=money(state.creditDebt);
+document.getElementById("fixedInvestment").textContent=money(state.protectedInvestment);
 
-  document.getElementById("allTransactions").innerHTML =
-    sorted.map(transactionHTML).join("") ||
-    '<p class="muted">Henüz işlem bulunmuyor.</p>';
+let advice="";
+if(c.afterMandatory<0){
+advice=`<div class="advice bad"><strong>Bu ay bütçen sıkışık.</strong><br>
+Zorunlu ödemelerin tamamı için ${money(Math.abs(c.afterMandatory))} açık görünüyor. Sabit yatırımını koruyoruz. Ek yatırım yapma. Kart için asgari tutarı hedefle; kira, kredi ve temel ihtiyaçlarını aksatma.</div>`;
+}else if(c.afterMandatory<5000){
+advice=`<div class="advice warning"><strong>Bu ay dikkatli olmalısın.</strong><br>
+Zorunlu ödemelerden sonra ${money(c.afterMandatory)} kalıyor. Kredi kartına asgari tutarı yatırmanı, ek yatırım yapmamanı öneriyorum.</div>`;
+}else{
+advice=`<div class="advice good"><strong>Bu ay bütçen dengeli.</strong><br>
+Zorunlu ödemelerden sonra ${money(c.afterMandatory)} kalıyor. Kredi kartına ${money(c.recommendedCard)} yatırabilir, ayrıca ${money(c.extraInvestment)} ek yatırım ayırabilirsin.</div>`;
+}
+document.getElementById("mainAdvice").innerHTML=advice;
 
-  document.getElementById("salary").value = state.salary;
-  document.getElementById("creditDebt").value = state.creditDebt;
-  document.getElementById("loanTotal").value = state.loanTotal;
-  document.getElementById("loanPaid").value = state.loanPaid;
+document.getElementById("miniPlan").innerHTML=
+line("Kredi taksiti",c.loanLeft)+
+line("Kira",c.rentLeft)+
+line("Diğer sabit giderler",c.fixedLeft)+
+line("Korunan sabit yatırım",c.investLeft)+
+line("Kart asgari ödeme tahmini",c.cardLeft)+
+line("Temel yaşam bütçesi",c.livingLeft);
+
+document.getElementById("minimumPayment").textContent=money(minPayment());
+document.getElementById("recommendedPayment").textContent=money(c.recommendedCard);
+document.getElementById("extraInvestment").textContent=money(c.extraInvestment);
+
+document.getElementById("cardExplanation").textContent=
+"Bu tutar dönem borcunun "+state.minimumRate+"% oranına göre hesaplanan tahmini asgari ödemedir. Bankanın ekstrede bildirdiği gerçek tutar esas alınmalıdır.";
+
+document.getElementById("planAdvice").innerHTML=advice+
+`<div class="advice"><strong>Ödeme için kullanılabilir tahmini kaynak:</strong><br>${money(c.available)}</div>`;
+
+document.getElementById("planDetails").innerHTML=
+line("Tahmini kullanılabilir kaynak",c.available)+
+line("Zorunlu ödemeler ve ayrılan bütçe",c.totalRequired)+
+line("Zorunlu ödemeler sonrası kalan",c.afterMandatory)+
+line("Ek kart ödemesi önerisi",c.extraCard)+
+line("Ek yatırım önerisi",c.extraInvestment);
+
+let sorted=[...state.transactions].sort((a,b)=>b.date.localeCompare(a.date));
+document.getElementById("recent").innerHTML=sorted.slice(0,5).map(transactionHTML).join("")||'<p class="muted">Henüz işlem yok.</p>';
+document.getElementById("allTransactions").innerHTML=sorted.map(transactionHTML).join("")||'<p class="muted">Henüz işlem yok.</p>';
+
+fillSettings();
 }
 
-window.deleteTransaction = function(id){
-  const t = state.transactions.find(x=>String(x.id)===String(id));
-  if(!t || t.system) return;
-  if(!confirm("Bu işlemi silmek istiyor musun?")) return;
-  state.transactions = state.transactions.filter(x=>String(x.id)!==String(id));
-  save();
-  render();
+function fillSettings(){
+const fields={
+salary:state.salary,
+loanPayment:state.loanPayment,
+fixedExpenses:state.fixedExpenses,
+rent:state.rent,
+livingBudget:state.livingBudget,
+protectedInvestment:state.protectedInvestment,
+loanTotal:state.loanTotal,
+loanPaid:state.loanPaid,
+cardLimit:state.cardLimit,
+cardDebtInput:state.creditDebt,
+cardPeriod:state.cardPeriod,
+minimumRate:state.minimumRate,
+cardDue:state.cardDue
+};
+Object.keys(fields).forEach(id=>{
+let el=document.getElementById(id);
+if(el)el.value=fields[id]??"";
+});
+}
+
+window.deleteTx=function(id){
+let t=state.transactions.find(x=>String(x.id)===String(id));
+if(!t||t.system)return;
+if(!confirm("Bu işlemi silmek istiyor musun?"))return;
+state.transactions=state.transactions.filter(x=>String(x.id)!==String(id));
+save();
+render();
 };
 
 document.querySelectorAll("nav button").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
-    document.getElementById(btn.dataset.tab).classList.remove("hidden");
-  });
+btn.addEventListener("click",()=>{
+document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+btn.classList.add("active");
+document.querySelectorAll("main section").forEach(x=>x.classList.add("hidden"));
+document.getElementById(btn.dataset.tab).classList.remove("hidden");
+});
 });
 
-document.getElementById("date").value = today();
+document.getElementById("date").value=today();
 
 document.getElementById("transactionForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const amount = number(document.getElementById("amount").value);
-  if(amount <= 0){alert("Geçerli bir tutar gir.");return;}
-
-  state.transactions.push({
-    id:"tx-" + Date.now(),
-    type:document.getElementById("type").value,
-    description:document.getElementById("description").value.trim(),
-    category:document.getElementById("category").value,
-    amount,
-    date:document.getElementById("date").value || today(),
-    system:false
-  });
-
-  save();
-  e.target.reset();
-  document.getElementById("date").value = today();
-  alert("İşlem kaydedildi.");
-  render();
-  document.querySelector('[data-tab="home"]').click();
+e.preventDefault();
+let amount=num(document.getElementById("amount").value);
+if(amount<=0){alert("Geçerli bir tutar gir.");return;}
+state.transactions.push({
+id:"tx-"+Date.now(),
+type:document.getElementById("type").value,
+description:document.getElementById("description").value.trim(),
+category:document.getElementById("category").value,
+amount,
+date:document.getElementById("date").value||today(),
+system:false
+});
+save();
+e.target.reset();
+document.getElementById("date").value=today();
+render();
+alert("İşlem kaydedildi.");
+document.querySelector('[data-tab="home"]').click();
 });
 
 document.getElementById("saveSettings").addEventListener("click",()=>{
-  state.salary = Math.max(0,number(document.getElementById("salary").value));
-  state.creditDebt = Math.max(0,number(document.getElementById("creditDebt").value));
-  state.loanTotal = Math.max(0,number(document.getElementById("loanTotal").value));
-  state.loanPaid = Math.max(0,number(document.getElementById("loanPaid").value));
-  save();
-  render();
-  alert("Ayarların kaydedildi.");
+["salary","loanPayment","fixedExpenses","rent","livingBudget","protectedInvestment","loanTotal","loanPaid"].forEach(id=>{
+state[id]=Math.max(0,num(document.getElementById(id).value));
+});
+save();
+render();
+alert("Ayarlar kaydedildi.");
+});
+
+document.getElementById("saveCard").addEventListener("click",()=>{
+state.cardLimit=Math.max(0,num(document.getElementById("cardLimit").value));
+state.creditDebt=Math.max(0,num(document.getElementById("cardDebtInput").value));
+state.cardPeriod=Math.max(0,num(document.getElementById("cardPeriod").value));
+state.minimumRate=Math.max(0,Math.min(100,num(document.getElementById("minimumRate").value)));
+state.cardDue=document.getElementById("cardDue").value;
+save();
+render();
+alert("Kart bilgileri kaydedildi.");
 });
 
 document.getElementById("export").addEventListener("click",()=>{
-  const blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "cuzdanim-yedek.json";
-  a.click();
-  URL.revokeObjectURL(url);
+let blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+let url=URL.createObjectURL(blob);
+let a=document.createElement("a");
+a.href=url;
+a.download="cuzdanim-yedek.json";
+a.click();
+URL.revokeObjectURL(url);
 });
 
 document.getElementById("importBtn").addEventListener("click",()=>{
-  document.getElementById("importFile").click();
+document.getElementById("importFile").click();
 });
 
 document.getElementById("importFile").addEventListener("change",async e=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  try{
-    const imported = JSON.parse(await file.text());
-    if(!Array.isArray(imported.transactions)) throw new Error("Geçersiz yedek");
-    if(!confirm("Mevcut verilerin yedek dosyasındaki verilerle değiştirilecek. Devam edilsin mi?")) return;
-    state = {...DEFAULT,...imported};
-    state.transactions = state.transactions.map(normalizeTransaction).filter(Boolean);
-    save();
-    render();
-    alert("Yedek başarıyla yüklendi.");
-  }catch(err){
-    alert("Yedek dosyası okunamadı.");
-  }
+let file=e.target.files[0];
+if(!file)return;
+try{
+let data=JSON.parse(await file.text());
+if(!Array.isArray(data.transactions))throw new Error();
+if(!confirm("Mevcut verilerin yedekle değiştirilecek. Devam edilsin mi?"))return;
+state={...DEFAULT,...data};
+state.transactions=state.transactions.map(normalize).filter(Boolean);
+save();
+render();
+alert("Yedek yüklendi.");
+}catch(err){alert("Yedek dosyası okunamadı.");}
 });
 
 save();
 render();
-
 })();
 </script>
 </body>
