@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -19,7 +20,6 @@ button.danger{background:#a33349}
 nav button{white-space:nowrap}
 .card{background:#152238;border:1px solid #293a55;border-radius:16px;padding:17px;margin-bottom:14px}
 h2{font-size:18px;margin:0 0 14px}
-h3{font-size:15px;margin:0 0 10px}
 .label{color:#9aabc4;font-size:13px}
 .balance{font-size:34px;font-weight:bold;margin:9px 0}
 .green{color:#4ade80}.red{color:#fb7185}.yellow{color:#fbbf24}
@@ -30,9 +30,6 @@ h3{font-size:15px;margin:0 0 10px}
 .item{padding:12px 0;border-bottom:1px solid #293a55}
 .item:last-child{border:0}
 .small{font-size:12px;color:#9aabc4;margin-top:5px;line-height:1.5}
-input,select{width:100%;background:#0e192a;color:white;border:1px solid #344761;border-radius:9px;padding:12px;margin:6px 0 13px;font-size:15px}
-label{font-size:13px;color:#bdc9da}
-.hidden{display:none}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .actions button{flex:1}
 .notice{font-size:13px;line-height:1.6;color:#bdc9da}
@@ -41,18 +38,15 @@ label{font-size:13px;color:#bdc9da}
 .advice.good{border-color:#4ade80}
 .advice.bad{border-color:#fb7185}
 .big{font-size:27px;font-weight:bold;margin:8px 0}
-.progress{height:9px;background:#293a55;border-radius:20px;overflow:hidden;margin:9px 0}
-.progress div{height:100%;background:#4ade80}
-.total-row{display:flex;justify-content:space-between;align-items:center;padding:16px 12px;margin-top:12px;background:#0e192a;border:1px solid #3978e8;border-radius:12px;font-weight:bold}
-.total-row strong{font-size:19px}
-.remaining-row{display:flex;justify-content:space-between;align-items:center;padding:16px 12px;margin-top:9px;background:#0e192a;border:1px solid #4ade80;border-radius:12px;font-weight:bold;gap:10px}
-.remaining-row strong{font-size:19px;text-align:right}
+.total-row,.remaining-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 12px;margin-top:10px;background:#0e192a;border-radius:12px;font-weight:bold}
+.total-row{border:1px solid #3978e8}
+.remaining-row{border:1px solid #4ade80}
+.total-row strong,.remaining-row strong{font-size:19px;text-align:right}
+input,select{width:100%;background:#0e192a;color:white;border:1px solid #344761;border-radius:9px;padding:12px;margin:6px 0 13px;font-size:15px}
+label{font-size:13px;color:#bdc9da}
+.hidden{display:none}
 hr{border:0;border-top:1px solid #293a55;margin:14px 0}
-@media(max-width:500px){
-.grid{grid-template-columns:1fr 1fr}
-.balance{font-size:29px}
-.stat{font-size:18px}
-}
+@media(max-width:500px){.grid{grid-template-columns:1fr 1fr}.balance{font-size:29px}.stat{font-size:18px}}
 </style>
 </head>
 <body>
@@ -72,7 +66,7 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 
 <section id="home">
 <div class="card">
-<div class="label">Kullanılabilir Bakiyen</div>
+<div class="label">Kullanılabilir Nakit / Banka Bakiyesi</div>
 <div class="balance" id="balance">0 TL</div>
 <div class="small" id="balanceInfo"></div>
 </div>
@@ -83,7 +77,7 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <div class="stat green" id="income">0 TL</div>
 </div>
 <div class="card">
-<div class="label">Bu Ay Gider</div>
+<div class="label">Bu Ay Harcama</div>
 <div class="stat red" id="expense">0 TL</div>
 </div>
 <div class="card">
@@ -91,9 +85,16 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <div class="stat red" id="cardDebt">0 TL</div>
 </div>
 <div class="card">
-<div class="label">Bu Ay Sabit Yatırım</div>
+<div class="label">Sabit Yatırım</div>
 <div class="stat green" id="fixedInvestment">3.000 TL</div>
 </div>
+</div>
+
+<div class="card">
+<h2>💳 Kredi Kartı Özeti</h2>
+<div class="row item"><span>Toplam kart borcu</span><strong id="cardDebt2">0 TL</strong></div>
+<div class="row item"><span>Bu dönem borcu</span><strong id="periodDebt">0 TL</strong></div>
+<div class="row item"><span>Tahmini asgari ödeme</span><strong id="minimumHome">0 TL</strong></div>
 </div>
 
 <div class="card">
@@ -115,7 +116,7 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <section id="plan" class="hidden">
 <div class="card">
 <h2>🤖 Akıllı Ödeme Planı</h2>
-<p class="notice">Uygulama mevcut paranı, maaşını ve zorunlu ödemelerini değerlendirerek sana ödeme önerisi oluşturur.</p>
+<p class="notice">Önce zorunlu ödemeler, sonra günlük harcamalar, en son ek yatırım ve ek borç ödemesi.</p>
 <div id="planAdvice"></div>
 </div>
 
@@ -124,24 +125,16 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <div class="label">Tahmini asgari ödeme</div>
 <div class="big yellow" id="minimumPayment">0 TL</div>
 <hr>
-<div class="label">Bu ay önerilen ödeme</div>
+<div class="label">Önerilen ödeme</div>
 <div class="big green" id="recommendedPayment">0 TL</div>
 <div class="small" id="cardExplanation"></div>
 </div>
 
 <div class="card">
 <h2>Yatırım Planın</h2>
-<div class="row">
-<span>Sabit yatırım</span>
-<strong class="green">3.000 TL</strong>
-</div>
-<div class="small">Her ay korunacak. Ek yatırım bütçesinden bağımsızdır.</div>
-<hr>
-<div class="row">
-<span>Ek yatırım önerisi</span>
-<strong id="extraInvestment">0 TL</strong>
-</div>
-<div class="small">Ayın kalan bütçesine göre hesaplanır.</div>
+<div class="row item"><span>Korunan sabit yatırım</span><strong class="green" id="protectedAmount">3.000 TL</strong></div>
+<div class="small">Bu yatırım diğer harcamalardan ayrı tutulur.</div>
+<div class="row item"><span>Ek yatırım önerisi</span><strong id="extraInvestment">0 TL</strong></div>
 </div>
 
 <div class="card">
@@ -163,12 +156,12 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <form id="transactionForm">
 <label>İşlem türü</label>
 <select id="type">
-<option value="expense">Gider</option>
+<option value="expense">Gider / Harcama</option>
 <option value="income">Gelir</option>
 </select>
 
 <label>Açıklama</label>
-<input id="description" placeholder="Örn. Market alışverişi" required>
+<input id="description" placeholder="Örn. Benzin aldım" required>
 
 <label>Kategori</label>
 <select id="category">
@@ -190,14 +183,24 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <option>Diğer</option>
 </select>
 
+<label>Ödeme yöntemi</label>
+<select id="paymentMethod">
+<option value="cash">Nakit</option>
+<option value="debit">Banka kartı / Hesap</option>
+<option value="credit">Kredi kartı</option>
+</select>
+
 <label>Tutar (TL)</label>
-<input id="amount" type="number" min="0.01" step="0.01" required>
+<input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required>
 
 <label>Tarih</label>
 <input id="date" type="date" required>
 
 <button class="primary" type="submit" style="width:100%">Kaydet</button>
 </form>
+<div class="advice">
+<strong>Bilgi:</strong> Kredi kartıyla alışveriş yaptığında kart borcun artar, nakit bakiyen değişmez. Kredi kartı borcu ödemesi yaptığında ise nakit azalır ve kart borcun düşer.
+</div>
 </div>
 </section>
 
@@ -208,6 +211,9 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <label>Aylık maaş</label>
 <input id="salary" type="number" min="0" step=".01">
 
+<label>Maaş günü</label>
+<input id="salaryDay" type="number" min="1" max="28">
+
 <label>Kredi taksiti</label>
 <input id="loanPayment" type="number" min="0" step=".01">
 
@@ -216,9 +222,6 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 
 <label>Aylık kira</label>
 <input id="rent" type="number" min="0" step=".01">
-
-<label>Aylık temel yaşam bütçesi</label>
-<input id="livingBudget" type="number" min="0" step=".01">
 
 <label>Sabit yatırım (dokunulmayacak)</label>
 <input id="protectedInvestment" type="number" min="0" step=".01">
@@ -251,6 +254,7 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <input id="cardDue" type="date">
 
 <button class="primary" id="saveCard" style="width:100%">Kart Bilgilerini Kaydet</button>
+<p class="small">Kart borcu alanına bankanın gösterdiği güncel toplam borcu gir. Sonraki kart alışverişleri bu tutara otomatik eklenecek.</p>
 </div>
 
 <div class="card">
@@ -260,7 +264,7 @@ hr{border:0;border-top:1px solid #293a55;margin:14px 0}
 <button id="importBtn">Yedek Yükle</button>
 </div>
 <input id="importFile" type="file" accept=".json" class="hidden">
-<p class="notice">Düzenli olarak yedek almanı öneririm.</p>
+<p class="notice">Ara sıra yedek almanı öneririm.</p>
 </div>
 </section>
 </main>
@@ -297,13 +301,6 @@ let n=Number(v);
 return Number.isFinite(n)?n:d;
 }
 
-function readOld(){
-try{
-let x=localStorage.getItem(KEY);
-return x?JSON.parse(x):null;
-}catch(e){return null;}
-}
-
 function normalize(t,i){
 if(!t||typeof t!=="object")return null;
 let a=num(t.amount??t.tutar);
@@ -312,49 +309,37 @@ let type=t.type||t.tur||"expense";
 if(type==="gider")type="expense";
 if(type==="gelir")type="income";
 if(type!=="income"&&type!=="expense")type="expense";
-return{
+return {
 id:t.id||"old-"+i,
 type,
 description:t.description||t.desc||t.aciklama||"İşlem",
 category:t.category||t.kategori||"Diğer",
 amount:a,
 date:String(t.date||t.tarih||START).slice(0,10),
-system:!!t.system
+paymentMethod:t.paymentMethod||"cash",
+system:!!t.system,
+cardDebtDelta:num(t.cardDebtDelta,0),
+cardPeriodDelta:num(t.cardPeriodDelta,0)
 };
 }
 
-function migrate(){
-let old=readOld();
-if(!old)return {...DEFAULT};
-let transactions=Array.isArray(old.transactions)?old.transactions.map(normalize).filter(Boolean):[];
+function loadState(){
+try{
+let raw=localStorage.getItem(KEY);
+if(!raw)return {...DEFAULT};
+let old=JSON.parse(raw);
 return {
 ...DEFAULT,
 ...old,
-openingBalance:num(old.openingBalance,12000),
-openingDate:old.openingDate||START,
-salary:num(old.salary??old.monthlySalary,94000),
-loanPayment:num(old.loanPayment,45000),
-fixedExpenses:num(old.fixedExpenses,15000),
-rent:num(old.rent,0),
-livingBudget:num(old.livingBudget,0),
-protectedInvestment:num(old.protectedInvestment,3000),
-creditDebt:num(old.creditDebt??old.cardDebt,91140.42),
-cardPeriod:num(old.cardPeriod,76030.07),
-cardLimit:num(old.cardLimit,140400),
-minimumRate:num(old.minimumRate,40),
-transactions
+transactions:Array.isArray(old.transactions)?
+old.transactions.map(normalize).filter(Boolean):[]
 };
+}catch(e){
+return {...DEFAULT};
+}
 }
 
-let state;
-try{
-let raw=localStorage.getItem(KEY);
-state=raw?JSON.parse(raw):migrate();
-}catch(e){state=migrate();}
-
-state={...DEFAULT,...state};
-if(!Array.isArray(state.transactions))state.transactions=[];
-state.transactions=state.transactions.map(normalize).filter(Boolean);
+let state=loadState();
 
 function save(){
 localStorage.setItem(KEY,JSON.stringify(state));
@@ -370,11 +355,19 @@ return today().slice(0,7);
 }
 
 function money(v){
-return new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(v||0);
+return new Intl.NumberFormat("tr-TR",{
+style:"currency",currency:"TRY",maximumFractionDigits:2
+}).format(v||0);
 }
 
 function esc(s){
-return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+return String(s).replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function methodName(m){
+return {cash:"Nakit",debit:"Banka kartı",credit:"Kredi kartı"}[m]||"Nakit";
 }
 
 function salaryAuto(){
@@ -389,14 +382,29 @@ description:"Aylık maaş",
 category:"Maaş",
 amount:num(state.salary),
 date:payday,
+paymentMethod:"debit",
 system:true
 });
 save();
 }
 
+function isCardPurchase(t){
+return t.type==="expense"&&t.paymentMethod==="credit"&&t.category!=="Kredi kartı ödemesi";
+}
+
+function isCardPayment(t){
+return t.type==="expense"&&t.category==="Kredi kartı ödemesi";
+}
+
+function affectsCash(t){
+if(t.type==="income")return true;
+if(isCardPurchase(t))return false;
+return true;
+}
+
 function balance(){
 return num(state.openingBalance,12000)+state.transactions
-.filter(t=>t.date>=(state.openingDate||START))
+.filter(t=>t.date>=(state.openingDate||START)&&affectsCash(t))
 .reduce((s,t)=>s+(t.type==="income"?t.amount:-t.amount),0);
 }
 
@@ -418,82 +426,87 @@ let list=monthlyTransactions();
 
 let loanLeft=Math.max(0,num(state.loanPayment)-sumCategory(list,"Kredi ödemesi"));
 let rentLeft=Math.max(0,num(state.rent)-sumCategory(list,"Kira"));
-
 let fixedPaid=sumCategory(list,"Fatura")+sumCategory(list,"Diğer");
 let fixedLeft=Math.max(0,num(state.fixedExpenses)-fixedPaid);
-
 let investLeft=Math.max(0,num(state.protectedInvestment)-sumCategory(list,"Sabit yatırım"));
-
 let cardLeft=Math.max(0,minPayment()-sumCategory(list,"Kredi kartı ödemesi"));
 
-let livingLeft=Math.max(0,num(state.livingBudget)-
-sumCategory(list,"Market")-
-sumCategory(list,"Yemek")-
-sumCategory(list,"Ulaşım")-
-sumCategory(list,"Yakıt")-
-sumCategory(list,"Kişisel")-
-sumCategory(list,"Sağlık"));
-
-return {loanLeft,rentLeft,fixedLeft,investLeft,cardLeft,livingLeft};
+return {loanLeft,rentLeft,fixedLeft,investLeft,cardLeft};
 }
 
 function expectedMoney(){
 let cash=balance();
 let m=month();
-let payday=m+"-15";
+let payday=m+"-"+String(state.salaryDay||15).padStart(2,"0");
 let salaryReceived=state.transactions.some(t=>t.id==="salary-"+m);
 if(today()<payday&&!salaryReceived)cash+=num(state.salary);
 return cash;
 }
 
+function discretionaryCardSpending(){
+return monthlyTransactions()
+.filter(t=>isCardPurchase(t)&&
+!["Kredi ödemesi","Kira","Fatura","Sabit yatırım"].includes(t.category))
+.reduce((s,t)=>s+t.amount,0);
+}
+
 function calculate(){
 let r=remainingPlan();
-let totalRequired=r.loanLeft+r.rentLeft+r.fixedLeft+r.investLeft+r.cardLeft+r.livingLeft;
+let totalRequired=r.loanLeft+r.rentLeft+r.fixedLeft+r.investLeft+r.cardLeft;
 let available=expectedMoney();
-let afterMandatory=available-totalRequired;
+let cardSpending=discretionaryCardSpending();
+
+/*
+Nakit ve banka kartı alışverişleri bakiyeden zaten düşer.
+Kredi kartı alışverişleri nakit bakiyeyi düşürmediği için
+serbest harcama hesabından ayrıca çıkarılır.
+*/
+let freeMoney=available-totalRequired-cardSpending;
 
 let extraCard=0;
 let extraInvestment=0;
 let recommendedCard=r.cardLeft;
 
-if(afterMandatory>=10000){
-extraCard=Math.floor((afterMandatory-5000)*0.5/100)*100;
-extraInvestment=Math.max(0,afterMandatory-5000-extraCard);
+if(freeMoney>=10000){
+extraCard=Math.floor((freeMoney-5000)*0.5/100)*100;
+extraInvestment=Math.max(0,freeMoney-5000-extraCard);
 recommendedCard+=extraCard;
-}else if(afterMandatory>0){
-extraCard=0;
-extraInvestment=0;
-}else{
-recommendedCard=r.cardLeft;
 }
 
 return {
 ...r,
-available,
 totalRequired,
-afterMandatory,
+available,
+cardSpending,
+freeMoney,
 extraCard,
 extraInvestment,
 recommendedCard
 };
 }
 
+function line(name,value){
+return `<div class="row item"><span>${name}</span><strong>${money(value)}</strong></div>`;
+}
+
 function transactionHTML(t){
 let sign=t.type==="income"?"+":"-";
 let color=t.type==="income"?"green":"red";
+let method=t.type==="income"?"Gelir":methodName(t.paymentMethod);
+let note=isCardPurchase(t)?"Kart borcuna eklendi":
+(isCardPayment(t)?"Kart borcundan düşüldü":"");
 return `<div class="item">
 <div class="row">
-<div><strong>${esc(t.description)}</strong>
-<div class="small">${esc(t.category)} · ${esc(t.date)}</div></div>
-<div style="text-align:right">
+<div style="min-width:0">
+<strong>${esc(t.description)}</strong>
+<div class="small">${esc(t.category)} · ${esc(t.date)}</div>
+<div class="small">${method}${note?" · "+note:""}</div>
+</div>
+<div style="text-align:right;flex-shrink:0">
 <strong class="${color}">${sign}${money(t.amount)}</strong>
 ${t.system?'<div class="small">Otomatik maaş</div>':`<button class="danger" style="padding:6px 9px;margin-top:5px" onclick="deleteTx('${esc(t.id)}')">Sil</button>`}
 </div>
 </div></div>`;
-}
-
-function line(name,value){
-return `<div class="row item"><span>${name}</span><strong>${money(value)}</strong></div>`;
 }
 
 function render(){
@@ -502,30 +515,33 @@ salaryAuto();
 let b=balance();
 let list=monthlyTransactions();
 let income=list.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
-let expense=list.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
+let spending=list.filter(t=>t.type==="expense"&&!isCardPayment(t))
+.reduce((s,t)=>s+t.amount,0);
 let c=calculate();
 
-/* Ay sonunda kalan: gelir - gerçekleşen giderler - henüz ödenmemiş planlı giderler */
-let monthlyRemaining=income-expense-c.totalRequired;
-
 document.getElementById("balance").textContent=money(b);
-document.getElementById("balanceInfo").textContent="Devir bakiyesi dahil · Bugünkü kullanılabilir para";
+document.getElementById("balanceInfo").textContent="Devir bakiyesi dahil · Nakit ve banka hesabındaki para";
 document.getElementById("income").textContent=money(income);
-document.getElementById("expense").textContent=money(expense);
+document.getElementById("expense").textContent=money(spending);
 document.getElementById("cardDebt").textContent=money(state.creditDebt);
+document.getElementById("cardDebt2").textContent=money(state.creditDebt);
+document.getElementById("periodDebt").textContent=money(state.cardPeriod);
+document.getElementById("minimumHome").textContent=money(minPayment());
 document.getElementById("fixedInvestment").textContent=money(state.protectedInvestment);
+document.getElementById("protectedAmount").textContent=money(state.protectedInvestment);
 
 let advice="";
-if(c.afterMandatory<0){
+if(c.freeMoney<0){
 advice=`<div class="advice bad"><strong>Bu ay bütçen sıkışık.</strong><br>
-Zorunlu ödemelerin tamamı için ${money(Math.abs(c.afterMandatory))} açık görünüyor. Sabit yatırımını koruyoruz. Ek yatırım yapma. Kart için asgari tutarı hedefle; kira, kredi ve temel ihtiyaçlarını aksatma.</div>`;
-}else if(c.afterMandatory<5000){
-advice=`<div class="advice warning"><strong>Bu ay dikkatli olmalısın.</strong><br>
-Zorunlu ödemelerden sonra ${money(c.afterMandatory)} kalıyor. Kredi kartına asgari tutarı yatırmanı, ek yatırım yapmamanı öneriyorum.</div>`;
+Zorunlu ödemeler ve yaptığın kredi kartı alışverişlerinden sonra ${money(Math.abs(c.freeMoney))} açık görünüyor. Ek yatırım yapma. Önce temel ihtiyaçlarını ve zorunlu ödemelerini güvenceye al.</div>`;
+}else if(c.freeMoney<5000){
+advice=`<div class="advice warning"><strong>Bu ay kontrollü harcama zamanı.</strong><br>
+Zorunlu ödemelerden ve kart alışverişlerinden sonra ${money(c.freeMoney)} kullanılabilir paran görünüyor. Bu tutarı günlük ihtiyaçların için koru. Ek yatırım önermiyorum.</div>`;
 }else{
 advice=`<div class="advice good"><strong>Bu ay bütçen dengeli.</strong><br>
-Zorunlu ödemelerden sonra ${money(c.afterMandatory)} kalıyor. Kredi kartına ${money(c.recommendedCard)} yatırabilir, ayrıca ${money(c.extraInvestment)} ek yatırım ayırabilirsin.</div>`;
+Zorunlu ödemelerden sonra ${money(c.freeMoney)} serbest paran var. Bunun en az 5.000 TL'sini günlük ihtiyaç ve beklenmedik masraflar için koruyoruz. Kalan kısım için ek ödeme ve yatırım önerisi aşağıda.</div>`;
 }
+
 document.getElementById("mainAdvice").innerHTML=advice;
 
 document.getElementById("miniPlan").innerHTML=
@@ -534,14 +550,10 @@ line("Kira",c.rentLeft)+
 line("Diğer sabit giderler",c.fixedLeft)+
 line("Korunan sabit yatırım",c.investLeft)+
 line("Kart asgari ödeme tahmini",c.cardLeft)+
-line("Temel yaşam bütçesi",c.livingLeft)+
-`<div class="total-row">
-<span>TOPLAM GİDER</span>
-<strong class="red">${money(c.totalRequired)}</strong>
-</div>
+`<div class="total-row"><span>TOPLAM ZORUNLU GİDER</span><strong class="red">${money(c.totalRequired)}</strong></div>
 <div class="remaining-row">
-<span>BU AY CEBİMİZDE KALAN</span>
-<strong class="${monthlyRemaining>=0?'green':'red'}">${money(monthlyRemaining)}</strong>
+<span>GÜNLÜK HARCAMALAR İÇİN KALAN</span>
+<strong class="${c.freeMoney>=0?'green':'red'}">${money(c.freeMoney)}</strong>
 </div>`;
 
 document.getElementById("minimumPayment").textContent=money(minPayment());
@@ -549,15 +561,18 @@ document.getElementById("recommendedPayment").textContent=money(c.recommendedCar
 document.getElementById("extraInvestment").textContent=money(c.extraInvestment);
 
 document.getElementById("cardExplanation").textContent=
-"Bu tutar dönem borcunun "+state.minimumRate+"% oranına göre hesaplanan tahmini asgari ödemedir. Bankanın ekstrede bildirdiği gerçek tutar esas alınmalıdır.";
+"Bu tutar dönem borcunun "+state.minimumRate+
+"% oranıyla hesaplanan tahmini asgari ödemedir. Bankanın ekstrede bildirdiği tutar esas alınmalıdır.";
 
 document.getElementById("planAdvice").innerHTML=advice+
-`<div class="advice"><strong>Ödeme için kullanılabilir tahmini kaynak:</strong><br>${money(c.available)}</div>`;
+`<div class="advice"><strong>Tahmini kullanılabilir nakit:</strong><br>${money(c.available)}</div>
+<div class="advice"><strong>Bu ay kredi kartıyla yapılan alışveriş:</strong><br>${money(c.cardSpending)}</div>`;
 
 document.getElementById("planDetails").innerHTML=
-line("Tahmini kullanılabilir kaynak",c.available)+
-line("Zorunlu ödemeler ve ayrılan bütçe",c.totalRequired)+
-line("Zorunlu ödemeler sonrası kalan",c.afterMandatory)+
+line("Kullanılabilir nakit / banka",c.available)+
+line("Kalan zorunlu ödemeler",c.totalRequired)+
+line("Kredi kartıyla yapılan günlük alışveriş",c.cardSpending)+
+`<div class="remaining-row"><span>GÜNLÜK HARCAMA BAKİYESİ</span><strong class="${c.freeMoney>=0?'green':'red'}">${money(c.freeMoney)}</strong></div>`+
 line("Ek kart ödemesi önerisi",c.extraCard)+
 line("Ek yatırım önerisi",c.extraInvestment);
 
@@ -571,10 +586,10 @@ fillSettings();
 function fillSettings(){
 const fields={
 salary:state.salary,
+salaryDay:state.salaryDay,
 loanPayment:state.loanPayment,
 fixedExpenses:state.fixedExpenses,
 rent:state.rent,
-livingBudget:state.livingBudget,
 protectedInvestment:state.protectedInvestment,
 loanTotal:state.loanTotal,
 loanPaid:state.loanPaid,
@@ -590,10 +605,17 @@ if(el)el.value=fields[id]??"";
 });
 }
 
+function applyCardEffect(t,direction){
+if(!t.cardDebtDelta&&!t.cardPeriodDelta)return;
+state.creditDebt=Math.max(0,num(state.creditDebt)-direction*num(t.cardDebtDelta));
+state.cardPeriod=Math.max(0,num(state.cardPeriod)-direction*num(t.cardPeriodDelta));
+}
+
 window.deleteTx=function(id){
 let t=state.transactions.find(x=>String(x.id)===String(id));
 if(!t||t.system)return;
 if(!confirm("Bu işlemi silmek istiyor musun?"))return;
+applyCardEffect(t,-1);
 state.transactions=state.transactions.filter(x=>String(x.id)!==String(id));
 save();
 render();
@@ -610,31 +632,85 @@ document.getElementById(btn.dataset.tab).classList.remove("hidden");
 
 document.getElementById("date").value=today();
 
+document.getElementById("type").addEventListener("change",()=>{
+let type=document.getElementById("type").value;
+let method=document.getElementById("paymentMethod");
+if(type==="income"){
+method.value="debit";
+}else if(method.value==="credit"){
+method.value="cash";
+}
+});
+
+document.getElementById("category").addEventListener("change",()=>{
+let cat=document.getElementById("category").value;
+if(cat==="Kredi kartı ödemesi"){
+document.getElementById("paymentMethod").value="debit";
+document.getElementById("type").value="expense";
+}
+});
+
 document.getElementById("transactionForm").addEventListener("submit",e=>{
 e.preventDefault();
+
 let amount=num(document.getElementById("amount").value);
 if(amount<=0){alert("Geçerli bir tutar gir.");return;}
-state.transactions.push({
+
+let type=document.getElementById("type").value;
+let category=document.getElementById("category").value;
+let paymentMethod=document.getElementById("paymentMethod").value;
+
+if(type==="income")paymentMethod="debit";
+
+if(category==="Kredi kartı ödemesi"&&paymentMethod==="credit"){
+alert("Kredi kartı borcunu yine kredi kartıyla ödeyemezsin. Nakit veya banka hesabını seç.");
+return;
+}
+
+let t={
 id:"tx-"+Date.now(),
-type:document.getElementById("type").value,
+type,
 description:document.getElementById("description").value.trim(),
-category:document.getElementById("category").value,
+category,
 amount,
 date:document.getElementById("date").value||today(),
-system:false
-});
+paymentMethod,
+system:false,
+cardDebtDelta:0,
+cardPeriodDelta:0
+};
+
+if(type==="expense"&&paymentMethod==="credit"&&!isCardPayment(t)){
+t.cardDebtDelta=amount;
+t.cardPeriodDelta=amount;
+state.creditDebt+=amount;
+state.cardPeriod+=amount;
+}
+
+if(isCardPayment(t)){
+let debtReduction=Math.min(amount,num(state.creditDebt));
+let periodReduction=Math.min(amount,num(state.cardPeriod));
+t.cardDebtDelta=-debtReduction;
+t.cardPeriodDelta=-periodReduction;
+state.creditDebt=Math.max(0,state.creditDebt-debtReduction);
+state.cardPeriod=Math.max(0,state.cardPeriod-periodReduction);
+}
+
+state.transactions.push(t);
 save();
 e.target.reset();
 document.getElementById("date").value=today();
+document.getElementById("paymentMethod").value="cash";
 render();
 alert("İşlem kaydedildi.");
 document.querySelector('[data-tab="home"]').click();
 });
 
 document.getElementById("saveSettings").addEventListener("click",()=>{
-["salary","loanPayment","fixedExpenses","rent","livingBudget","protectedInvestment","loanTotal","loanPaid"].forEach(id=>{
+["salary","loanPayment","fixedExpenses","rent","protectedInvestment","loanTotal","loanPaid"].forEach(id=>{
 state[id]=Math.max(0,num(document.getElementById(id).value));
 });
+state.salaryDay=Math.max(1,Math.min(28,num(document.getElementById("salaryDay").value,15)));
 save();
 render();
 alert("Ayarlar kaydedildi.");
@@ -648,7 +724,7 @@ state.minimumRate=Math.max(0,Math.min(100,num(document.getElementById("minimumRa
 state.cardDue=document.getElementById("cardDue").value;
 save();
 render();
-alert("Kart bilgileri kaydedildi.");
+alert("Kart bilgileri kaydedildi. Bundan sonraki kart işlemleri bu tutarlara göre hesaplanacak.");
 });
 
 document.getElementById("export").addEventListener("click",()=>{
@@ -677,7 +753,9 @@ state.transactions=state.transactions.map(normalize).filter(Boolean);
 save();
 render();
 alert("Yedek yüklendi.");
-}catch(err){alert("Yedek dosyası okunamadı.");}
+}catch(err){
+alert("Yedek dosyası okunamadı.");
+}
 });
 
 save();
